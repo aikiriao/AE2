@@ -9,6 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <cfloat>
+
 #include "ae2_fft.h"
 #include "ae2_window_function.h"
 
