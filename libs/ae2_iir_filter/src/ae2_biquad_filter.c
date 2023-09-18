@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <assert.h>
+#include <stddef.h>
 
 /* 円周率 */
 #define AE2_PI 3.14159265358979323846
@@ -161,11 +162,11 @@ void AE2BiquadFilter_SetLowShelf(
     alpha = sinw0 / (2.0 * quality_factor);
     a0 = (A + 1.0) + (A - 1.0) * cosw0 + 2.0 * sqrt(A) * alpha;
 
-    filter->b0 = A * ((A + 1.0) - (A - 1.0) * cosw0 + 2.0 * sqrt(A) * alpha) / a0;
-    filter->b1 = 2.0 * A * ((A - 1.0) - (A + 1.0) * cosw0) / a0;
-    filter->b2 = A * ((A + 1.0) - (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0;
-    filter->a1 = -2.0 * ((A - 1.0) + (A + 1.0) * cosw0) / a0;
-    filter->a2 = ((A + 1.0) + (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0;
+    filter->b0 = (float)(A * ((A + 1.0) - (A - 1.0) * cosw0 + 2.0 * sqrt(A) * alpha) / a0);
+    filter->b1 = (float)(2.0 * A * ((A - 1.0) - (A + 1.0) * cosw0) / a0);
+    filter->b2 = (float)(A * ((A + 1.0) - (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0);
+    filter->a1 = (float)(-2.0 * ((A - 1.0) + (A + 1.0) * cosw0) / a0);
+    filter->a2 = (float)(((A + 1.0) + (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0);
 }
 
 /* ハイシェルフフィルタの設定 */
@@ -188,11 +189,11 @@ void AE2BiquadFilter_SetHighShelf(
     alpha = sinw0 / (2.0 * quality_factor);
     a0 = (A + 1.0) - (A - 1.0) * cosw0 + 2.0 * sqrt(A) * alpha;
 
-    filter->b0 = A * ((A + 1.0) + (A - 1.0) * cosw0 + 2.0 * sqrt(A) * alpha) / a0;
-    filter->b1 = -2.0 * A * ((A - 1.0) + (A + 1.0) * cosw0) / a0;
-    filter->b2 = A * ((A + 1.0) + (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0;
-    filter->a1 = 2.0 * ((A - 1.0) - (A + 1.0) * cosw0) / a0;
-    filter->a2 = ((A + 1.0) - (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0;
+    filter->b0 = (float)(A * ((A + 1.0) + (A - 1.0) * cosw0 + 2.0 * sqrt(A) * alpha) / a0);
+    filter->b1 = (float)(-2.0 * A * ((A - 1.0) + (A + 1.0) * cosw0) / a0);
+    filter->b2 = (float)(A * ((A + 1.0) + (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0);
+    filter->a1 = (float)(2.0 * ((A - 1.0) - (A + 1.0) * cosw0) / a0);
+    filter->a2 = (float)(((A + 1.0) - (A - 1.0) * cosw0 - 2.0 * sqrt(A) * alpha) / a0);
 }
 
 /* フィルタ内部状態リセット */
