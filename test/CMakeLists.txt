@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.15)
+
+add_subdirectory(ae2_ring_buffer)
+add_subdirectory(ae2_fft)
+add_subdirectory(ae2_convolve)
+add_subdirectory(ae2_window_function)
+add_subdirectory(ae2_iir_filter)
