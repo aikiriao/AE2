@@ -1,0 +1,102 @@
+name: C/C++ CI
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Preparation on Linux
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install libpulse-dev
+
+    - name: Preparation on Windows
+      if: runner.os == 'Windows'
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Build libraries
+      run: |
+        cmake -B build_debug -DCMAKE_BUILD_TYPE=Debug
+        cmake --build build_debug --config Debug
+        cmake -B build_release -DCMAKE_BUILD_TYPE=Release
+        cmake --build build_release --config Release
+
+    - name: Test
+      run: |
+        pushd build_debug
+        ctest -C Debug
+        popd
+        pushd build_release
+        ctest -C Release
+        popd
+
+    - name: Build plugins
+      run: |
+        pushd tools/01_simple_convolver
+        cmake -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
+        popd
+        pushd tools/02_distortion
+        cmake -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
+        popd
+        pushd tools/03_spectrum_analyzer
+        cmake -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
+        popd
+        pushd tools/04_nbands_equalizer
+        cmake -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
+        popd
+
+    - name: Create artifacts on UNIX platform
+      if: runner.os == 'Linux' || runner.os == 'macOS'
+      run: |
+        ARTIFACT_ROOT=artifact_${{ matrix.os }}
+        mkdir ${ARTIFACT_ROOT} 
+        pushd ${ARTIFACT_ROOT}
+        mkdir plugins
+        popd
+        cp plugins/01_simple_convolver/build ${ARTIFACT_ROOT}/plugins/
+        cp plugins/02_distortion/build ${ARTIFACT_ROOT}/plugins/
+        cp plugins/03_spectrum_analyzer/build ${ARTIFACT_ROOT}/plugins/
+        cp plugins/04_nbands_equalizer/build ${ARTIFACT_ROOT}/plugins/
+        tar -czf ${ARTIFACT_ROOT}.tar.gz ${ARTIFACT_ROOT} 
+
+    - name: Create artifacts on Windows platform
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: |
+        $ARTIFACT_ROOT = "artifact_${{ matrix.os }}"
+        mkdir ${ARTIFACT_ROOT} 
+        pushd ${ARTIFACT_ROOT}
+        mkdir plugins
+        popd
+        cp plugins/01_simple_convolver/build ${ARTIFACT_ROOT}/plugins/
+        cp plugins/02_distortion/build ${ARTIFACT_ROOT}/plugins/
+        cp plugins/03_spectrum_analyzer/build ${ARTIFACT_ROOT}/plugins/
+        cp plugins/04_nbands_equalizer/build ${ARTIFACT_ROOT}/plugins/
+        tar -czf "${ARTIFACT_ROOT}.tar.gz" ${ARTIFACT_ROOT} 
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: |
+          artifact_${{ matrix.os }}.tar.gz
