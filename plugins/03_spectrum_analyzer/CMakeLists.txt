@@ -90,10 +90,6 @@ else()
     )
 endif()
 
-if (UNIX AND NOT APPLE)
-    target_link_libraries(${PLUGIN_NAME} m curl)
-endif()
-
 # JuceHeader.hの自動生成
 juce_generate_juce_header(${PLUGIN_NAME})
 
