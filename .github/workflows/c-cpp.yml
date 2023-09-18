@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [ubuntu-20.04, ubuntu-latest, macos-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +26,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install libpulse-dev
+        sudo apt-get install libpulse-dev libxrandr-dev
 
     - name: Preparation on Windows
       if: runner.os == 'Windows'
