@@ -12,14 +12,14 @@
 //==============================================================================
 AE2NBandsEqualizerAudioProcessor::AE2NBandsEqualizerAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor (BusesProperties()
+                    #if ! JucePlugin_IsMidiEffect
+                    #if ! JucePlugin_IsSynth
+                        .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                    #endif
+                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                    #endif
+                    )
 #endif
     , parameters(*this, nullptr, juce::Identifier("AE2NBandsEqualizer"), createParameterLayout())
     , samplingRate(44100.0f)
@@ -93,31 +93,31 @@ const juce::String AE2NBandsEqualizerAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-bool AE2NBandsEqualizerAudioProcessor::acceptsMidi() const
+bool AE2TemplateAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+    #if JucePlugin_WantsMidiInput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2NBandsEqualizerAudioProcessor::producesMidi() const
+bool AE2TemplateAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+    #if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2NBandsEqualizerAudioProcessor::isMidiEffect() const
+bool AE2TemplateAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+    #if JucePlugin_IsMidiEffect
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
 double AE2NBandsEqualizerAudioProcessor::getTailLengthSeconds() const

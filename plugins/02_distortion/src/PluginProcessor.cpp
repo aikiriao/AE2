@@ -88,14 +88,14 @@ namespace {
 //==============================================================================
 AE2DistortionAudioProcessor::AE2DistortionAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor (BusesProperties()
+                    #if ! JucePlugin_IsMidiEffect
+                    #if ! JucePlugin_IsSynth
+                        .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                    #endif
+                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                    #endif
+                    )
 #endif
     , parameters(*this, nullptr, juce::Identifier("AE2Distortion"),
         {
@@ -138,31 +138,31 @@ const juce::String AE2DistortionAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-bool AE2DistortionAudioProcessor::acceptsMidi() const
+bool AE2TemplateAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+    #if JucePlugin_WantsMidiInput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2DistortionAudioProcessor::producesMidi() const
+bool AE2TemplateAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+    #if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2DistortionAudioProcessor::isMidiEffect() const
+bool AE2TemplateAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+    #if JucePlugin_IsMidiEffect
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
 double AE2DistortionAudioProcessor::getTailLengthSeconds() const

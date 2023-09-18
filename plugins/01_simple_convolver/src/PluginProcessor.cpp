@@ -21,14 +21,14 @@ namespace {
 //==============================================================================
 AE2AudioProcessor::AE2AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor (BusesProperties()
+                    #if ! JucePlugin_IsMidiEffect
+                    #if ! JucePlugin_IsSynth
+                        .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                    #endif
+                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                    #endif
+                    )
 #endif
 {
     const uint32_t defaultNumChannels = sizeof(pdefaultImpulse) / sizeof(pdefaultImpulse[0]);
@@ -93,31 +93,31 @@ const juce::String AE2AudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-bool AE2AudioProcessor::acceptsMidi() const
+bool AE2TemplateAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+    #if JucePlugin_WantsMidiInput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2AudioProcessor::producesMidi() const
+bool AE2TemplateAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+    #if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2AudioProcessor::isMidiEffect() const
+bool AE2TemplateAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+    #if JucePlugin_IsMidiEffect
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
 double AE2AudioProcessor::getTailLengthSeconds() const

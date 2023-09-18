@@ -15,14 +15,14 @@
 //==============================================================================
 AE2SpectrumAnalyzerAudioProcessor::AE2SpectrumAnalyzerAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor (BusesProperties()
+                    #if ! JucePlugin_IsMidiEffect
+                    #if ! JucePlugin_IsSynth
+                        .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                    #endif
+                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                    #endif
+                    )
 #endif
     , parameters(*this, nullptr, juce::Identifier("AE2AE2SpectrumAnalyzer"),
         {
@@ -77,31 +77,31 @@ const juce::String AE2SpectrumAnalyzerAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-bool AE2SpectrumAnalyzerAudioProcessor::acceptsMidi() const
+bool AE2TemplateAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+    #if JucePlugin_WantsMidiInput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2SpectrumAnalyzerAudioProcessor::producesMidi() const
+bool AE2TemplateAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+    #if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
-bool AE2SpectrumAnalyzerAudioProcessor::isMidiEffect() const
+bool AE2TemplateAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+    #if JucePlugin_IsMidiEffect
     return true;
-   #else
+    #else
     return false;
-   #endif
+    #endif
 }
 
 double AE2SpectrumAnalyzerAudioProcessor::getTailLengthSeconds() const
