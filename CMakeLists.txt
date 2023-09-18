@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 
 set(AE2_VERSION "0.0.1")
 
-option(BUILD_AE2_DOCUMENTATION "Create doxygen documentation for developers" ON)
+option(BUILD_AE2_DOCUMENTATION "Create doxygen documentation for developers" OFF)
 
 # 静的ライブラリ
 project(AE2 C)

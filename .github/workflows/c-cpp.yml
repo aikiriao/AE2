@@ -22,8 +22,6 @@ jobs:
       with:
         submodules: true
 
-    - uses: mattnotmitt/doxygen-action@v1.9.5
-
     - name: Preparation on Linux
       if: runner.os == 'Linux'
       run: |
