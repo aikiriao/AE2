@@ -68,6 +68,13 @@ target_link_libraries(${PLUGIN_NAME}
     juce::juce_product_unlocking
     )
 
+# Linux環境では追加でGTKが必要
+if (UNIX)
+    find_package(GTK REQUIRED)
+    target_include_directories(${PLUGIN_NAME} PRIVATE ${GTK_INCLUDE_DIR})
+    target_link_libraries(${PLUGIN_NAME} PRIVATE ${GTK_LIBRARIES})
+endif()
+
 # JuceHeader.hの自動生成
 juce_generate_juce_header(${PLUGIN_NAME})
 
