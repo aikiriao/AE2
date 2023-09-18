@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <assert.h>
+#include <stddef.h>
 
 #include "ae2_biquad_filter.h"
 
