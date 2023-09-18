@@ -93,7 +93,7 @@ const juce::String AE2NBandsEqualizerAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-bool AE2TemplateAudioProcessor::acceptsMidi() const
+bool AE2NBandsEqualizerAudioProcessor::acceptsMidi() const
 {
     #if JucePlugin_WantsMidiInput
     return true;
@@ -102,7 +102,7 @@ bool AE2TemplateAudioProcessor::acceptsMidi() const
     #endif
 }
 
-bool AE2TemplateAudioProcessor::producesMidi() const
+bool AE2NBandsEqualizerAudioProcessor::producesMidi() const
 {
     #if JucePlugin_ProducesMidiOutput
     return true;
@@ -111,7 +111,7 @@ bool AE2TemplateAudioProcessor::producesMidi() const
     #endif
 }
 
-bool AE2TemplateAudioProcessor::isMidiEffect() const
+bool AE2NBandsEqualizerAudioProcessor::isMidiEffect() const
 {
     #if JucePlugin_IsMidiEffect
     return true;

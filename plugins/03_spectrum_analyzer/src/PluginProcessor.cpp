@@ -77,7 +77,7 @@ const juce::String AE2SpectrumAnalyzerAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-bool AE2TemplateAudioProcessor::acceptsMidi() const
+bool AE2SpectrumAnalyzerAudioProcessor::acceptsMidi() const
 {
     #if JucePlugin_WantsMidiInput
     return true;
@@ -86,7 +86,7 @@ bool AE2TemplateAudioProcessor::acceptsMidi() const
     #endif
 }
 
-bool AE2TemplateAudioProcessor::producesMidi() const
+bool AE2SpectrumAnalyzerAudioProcessor::producesMidi() const
 {
     #if JucePlugin_ProducesMidiOutput
     return true;
@@ -95,7 +95,7 @@ bool AE2TemplateAudioProcessor::producesMidi() const
     #endif
 }
 
-bool AE2TemplateAudioProcessor::isMidiEffect() const
+bool AE2SpectrumAnalyzerAudioProcessor::isMidiEffect() const
 {
     #if JucePlugin_IsMidiEffect
     return true;

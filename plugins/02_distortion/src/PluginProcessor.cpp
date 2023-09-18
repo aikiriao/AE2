@@ -138,7 +138,7 @@ const juce::String AE2DistortionAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-bool AE2TemplateAudioProcessor::acceptsMidi() const
+bool AE2DistortionAudioProcessor::acceptsMidi() const
 {
     #if JucePlugin_WantsMidiInput
     return true;
@@ -147,7 +147,7 @@ bool AE2TemplateAudioProcessor::acceptsMidi() const
     #endif
 }
 
-bool AE2TemplateAudioProcessor::producesMidi() const
+bool AE2DistortionAudioProcessor::producesMidi() const
 {
     #if JucePlugin_ProducesMidiOutput
     return true;
@@ -156,7 +156,7 @@ bool AE2TemplateAudioProcessor::producesMidi() const
     #endif
 }
 
-bool AE2TemplateAudioProcessor::isMidiEffect() const
+bool AE2DistortionAudioProcessor::isMidiEffect() const
 {
     #if JucePlugin_IsMidiEffect
     return true;
