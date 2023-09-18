@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "PluginProcessor.h"
@@ -60,7 +60,7 @@ namespace {
         return sign(in) * (1.0 - expf(-fabs(in)));
     }
 
-    // 線形振幅変換（何もしない） 
+    // 線形振幅変換（何もしない）
     inline float linear_amplifiter(float in)
     {
         return in;
@@ -120,7 +120,7 @@ AE2DistortionAudioProcessor::AE2DistortionAudioProcessor()
                 0),
         })
 {
-    // パラメータと紐づけ 
+    // パラメータと紐づけ
     bypass = parameters.getRawParameterValue("bypass");
     inGain = parameters.getRawParameterValue("inGain");
     outLevel = parameters.getRawParameterValue("outLevel");
@@ -240,7 +240,7 @@ void AE2DistortionAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // バイパス判定 
+    // バイパス判定
     if (*bypass > 0.5f) {
         return;
     }
@@ -259,7 +259,7 @@ void AE2DistortionAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     float (*clipping)(float) = nullptr;
     float (*amplifer)(float) = nullptr;
 
-    // クリッピング曲線の選択 
+    // クリッピング曲線の選択
     switch (static_cast<int>(*clippingCurve)) {
     case 0: clipping = linear_clip; break;
     case 1: clipping = atan_clip; break;
@@ -268,7 +268,7 @@ void AE2DistortionAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     default: jassertfalse;
     }
 
-    // 振幅変換手法の選択 
+    // 振幅変換手法の選択
     switch (static_cast<int>(*amplifierConversion)) {
     case 0: amplifer = linear_amplifiter; break;
     case 1: amplifer = fullwave_rectifier; break;
@@ -276,7 +276,7 @@ void AE2DistortionAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     case 3: amplifer = square_amplifiter; break;
     default: jassertfalse;
     }
-    
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
@@ -291,7 +291,7 @@ void AE2DistortionAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
         for (int smpl = 0; smpl < buffer.getNumSamples(); smpl++) {
             channelData[smpl] = amplifer(channelData[smpl]);
         }
-    
+
         // ゲイン強調・閾値処理・出力ゲイン決定
         for (int smpl = 0; smpl < buffer.getNumSamples(); smpl++) {
             channelData[smpl] *= gain;

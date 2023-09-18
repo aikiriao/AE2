@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "PluginProcessor.h"
@@ -155,7 +155,7 @@ void AE2NBandsEqualizerAudioProcessor::prepareToPlay (double sampleRate, int sam
     // サンプリングレートを記録
     samplingRate = sampleRate;
 
-    // サンプリングレート変更に伴って全フィルタを再計算 
+    // サンプリングレート変更に伴って全フィルタを再計算
     for (int i = 0; i < *bandsCount; i++) {
         recalculateFilterCoefficients(i);
         for (int ch = 0; ch < maxProcessChannelCount; ch++) {
@@ -202,7 +202,7 @@ void AE2NBandsEqualizerAudioProcessor::processBlock (juce::AudioBuffer<float>& b
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // バイパス判定 
+    // バイパス判定
     if (*bypass > 0.5f) {
         return;
     }
@@ -265,7 +265,7 @@ void AE2NBandsEqualizerAudioProcessor::setStateInformation (const void* data, in
     }
 }
 
-// フィルタ係数再計算 
+// フィルタ係数再計算
 void AE2NBandsEqualizerAudioProcessor::recalculateFilterCoefficients(int band)
 {
     for (int ch = 0; ch < maxProcessChannelCount; ch++) {
@@ -299,7 +299,7 @@ void AE2NBandsEqualizerAudioProcessor::recalculateFilterCoefficients(int band)
         }
     }
 
-    // 周波数応答の再計算 
+    // 周波数応答の再計算
     for (int i = 0; i < frequencyResponseBins; i++) {
         frequencyResponse[i] = 0.0;
     }
@@ -308,7 +308,7 @@ void AE2NBandsEqualizerAudioProcessor::recalculateFilterCoefficients(int band)
             const struct AE2BiquadFilter *f = &bands[i].filter[0];
             for (int j = 0; j < frequencyResponseBins; j++) {
                 const double omega0 = (MathConstants<double>::pi * j) / frequencyResponseBins;
-                // TODO: テーブルにしておくといいかも 
+                // TODO: テーブルにしておくといいかも
                 const double sinw0 = sin(omega0);
                 const double cosw0 = cos(omega0);
                 const double denom2 = pow(cosw0 + f->a1 + f->a2 * cosw0, 2) + pow(sinw0 - f->a2 * sinw0, 2);
@@ -321,7 +321,7 @@ void AE2NBandsEqualizerAudioProcessor::recalculateFilterCoefficients(int band)
 
 void AE2NBandsEqualizerAudioProcessor::parameterChanged(const String &parameterID, float newValue)
 {
-    // バンド数が変わったら全フィルタ係数を再計算 
+    // バンド数が変わったら全フィルタ係数を再計算
     if (parameterID == "nbands") {
         for (int i = 0; i < newValue; i++) {
             recalculateFilterCoefficients(i);
@@ -329,7 +329,7 @@ void AE2NBandsEqualizerAudioProcessor::parameterChanged(const String &parameterI
         return;
     }
 
-    // "_"の後にある数字からバンドを特定 
+    // "_"の後にある数字からバンドを特定
     int start;
     if ((start = parameterID.indexOf("_")) != -1) {
         const int band = parameterID.substring(start + 1).getIntValue();

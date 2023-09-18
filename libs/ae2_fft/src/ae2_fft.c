@@ -22,7 +22,7 @@ typedef struct AE2FFTComplex {
 static void AE2FFT_ComplexFFT(int n, int flag, AE2FFTComplex *x, AE2FFTComplex *y);
 
 /* 複素数型のサイズチェック floatの配列を複素数型とみなして計算するため
-* 構造体にパディングなどが入ってしまうとサイズが合わなくなる 
+* 構造体にパディングなどが入ってしまうとサイズが合わなくなる
 * 合わない場合は#pragmaで構造体をパックする */
 extern char AE2FFT_checksize[(sizeof(AE2FFTComplex) == (sizeof(float) * 2)) ? 1 : -1];
 

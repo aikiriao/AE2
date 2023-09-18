@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #pragma once
@@ -62,45 +62,45 @@ public:
     static constexpr int frequencyResponseBins = 512; //! 周波数応答を計算するビン数
     static constexpr float maxGaindB = 30.0; //! 最大のゲイン[dB]
     static constexpr float minGaindB = -30.0; //! 最小のゲイン[dB]
-    double frequencyResponse[frequencyResponseBins]; //! 周波数応答 
+    double frequencyResponse[frequencyResponseBins]; //! 周波数応答
     float samplingRate;
 
-    //! パラメータ変更時の動作 
+    //! パラメータ変更時の動作
     void parameterChanged(const String &parameterID, float newValue) override;
 
 private:
-    static constexpr int maxProcessChannelCount = 2; //! 処理チャンネル数 
-    //! フィルタの種類 
+    static constexpr int maxProcessChannelCount = 2; //! 処理チャンネル数
+    //! フィルタの種類
     enum class FilterType {
-        FILTER_TYPE_LOWPASS = 0, //! ローパス 
-        FILTER_TYPE_HIGHPASS, //! ハイパス 
-        FILTER_TYPE_BANDPASS, //! バンドパス 
-        FILTER_TYPE_BANDELIMINATE, //! バンドエリミネート 
-        FILTER_TYPE_ALLPASS, //! オールパス 
-        FILTER_TYPE_LOWSHELF, //! ローシェルフ  
-        FILTER_TYPE_HIGHSHELF, //! ハイシェルフ  
+        FILTER_TYPE_LOWPASS = 0, //! ローパス
+        FILTER_TYPE_HIGHPASS, //! ハイパス
+        FILTER_TYPE_BANDPASS, //! バンドパス
+        FILTER_TYPE_BANDELIMINATE, //! バンドエリミネート
+        FILTER_TYPE_ALLPASS, //! オールパス
+        FILTER_TYPE_LOWSHELF, //! ローシェルフ
+        FILTER_TYPE_HIGHSHELF, //! ハイシェルフ
         NUMBER_OF_FILTER_TYPES,
     };
 
-    //! 1バンドあたりのイコライザ 
+    //! 1バンドあたりのイコライザ
     struct Equalizer {
-        struct AE2BiquadFilter filter[maxProcessChannelCount]; //! フィルタ実体 
-        std::atomic<float> *active = nullptr; //! 有効フラグ 
-        std::atomic<float> *type = nullptr; //! 種類 
-        std::atomic<float> *frequency = nullptr; //! 周波数パラメータ 
-        std::atomic<float> *qualityFactor = nullptr; //! クオリティファクタ 
+        struct AE2BiquadFilter filter[maxProcessChannelCount]; //! フィルタ実体
+        std::atomic<float> *active = nullptr; //! 有効フラグ
+        std::atomic<float> *type = nullptr; //! 種類
+        std::atomic<float> *frequency = nullptr; //! 周波数パラメータ
+        std::atomic<float> *qualityFactor = nullptr; //! クオリティファクタ
         std::atomic<float> *gain = nullptr; //! ゲイン
     };
 
     juce::AudioProcessorValueTreeState parameters;
 
-    std::atomic<float> *bypass = nullptr;   //! バイパスフラグ 
-    std::atomic<float> *bandsCount = nullptr; //! 現在処理しているバンド数 
-    struct Equalizer bands[maxEqualizerBandsCount]; //! バンド 
+    std::atomic<float> *bypass = nullptr;   //! バイパスフラグ
+    std::atomic<float> *bandsCount = nullptr; //! 現在処理しているバンド数
+    struct Equalizer bands[maxEqualizerBandsCount]; //! バンド
 
-    //! パラメータレイアウトの作成 
+    //! パラメータレイアウトの作成
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout(void);
-    //! フィルタ係数再計算 
+    //! フィルタ係数再計算
     void recalculateFilterCoefficients(int band);
 
     //==============================================================================

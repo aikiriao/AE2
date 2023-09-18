@@ -15,8 +15,8 @@
 #define AE2IIRFILTER_NUM_BIQUAD_FILTERS(order) (((order) + 1) / 2)
 
 /*!
- * @brief IIRフィルタ構造体
- */
+* @brief IIRフィルタ構造体
+*/
 struct AE2IIRFilter {
     int32_t max_order; /*!< 最大次数 */
     int32_t order; /*!< 現在セットされている次数 */
@@ -97,10 +97,10 @@ void AE2IIRFilter_Destroy(struct AE2IIRFilter *filter)
 void AE2IIRFilter_ClearBuffer(struct AE2IIRFilter *filter)
 {
     int32_t i;
-    
+
     /* 引数チェック */
     assert(filter != NULL);
-    
+
     /* 全フィルタのバッファをクリア */
     for (i = 0; i < filter->num_biquad_filters; i++) {
         AE2BiquadFilter_ClearBuffer(&filter->biquad_filter[i]);
@@ -195,7 +195,7 @@ static void AE2IIRFilter_Set1stOrderHighPassByReal(struct AE2BiquadFilter *filte
 /* バターワースフィルタ設定の共通ルーチン */
 static void AE2IIRFilter_SetButterworthCommon(
     struct AE2IIRFilter *filter,
-    int32_t order, float sampling_rate, float frequency, 
+    int32_t order, float sampling_rate, float frequency,
     void (*biquad_setter)(struct AE2BiquadFilter *, double, double, double),
     void (*first_order_setter)(struct AE2BiquadFilter *, double, double))
 {
@@ -240,7 +240,7 @@ void AE2IIRFilter_SetButterworthLowPass(
 
     /* 共通ルーチンを使用して設計 */
     AE2IIRFilter_SetButterworthCommon(
-        filter, order, sampling_rate, frequency, 
+        filter, order, sampling_rate, frequency,
         AE2IIRFilter_SetBiquadLowPassByConjugatePole, AE2IIRFilter_Set1stOrderLowPassByReal);
 }
 
@@ -285,7 +285,7 @@ static void AE2IIRFilter_SetChebyShevCommon(
     const double omega0 = 2.0 * AE2_PI * frequency / sampling_rate;
     /* 計算用定数 */
     const double b = asinh(1.0 / epsilon) / order;
-    
+
     /* バイクアッドフィルタに係数設定 */
     for (i = 0; i < order / 2; i++) {
         /* 単位円から遠い（発散しずらい）極から処理していくため、末尾から設定 */
@@ -295,12 +295,12 @@ static void AE2IIRFilter_SetChebyShevCommon(
         const double im_pk = sin(theta_k) * cosh(b);
         biquad_setter(f, omega0, re_pk, im_pk);
     }
-    
+
     /* 奇数の場合、最初のフィルタは1次フィルタ */
     if (order % 2 == 1) {
         first_order_setter(&filter->biquad_filter[0], omega0, -sinh(b));
     }
-    
+
     /* 通過域のゲインが1になるように先頭のフィルタで補正 */
     {
         struct AE2BiquadFilter *f = &filter->biquad_filter[0];

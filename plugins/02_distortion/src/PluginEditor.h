@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #pragma once
@@ -29,7 +29,7 @@ private:
     // access the processor object that created it.
     AE2DistortionAudioProcessor& audioProcessor;
 
-    // 型名が長いため型エイリアスを使用 
+    // 型名が長いため型エイリアスを使用
     using ButtonAttachment = AudioProcessorValueTreeState::ButtonAttachment;
     using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
     using ComboBoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;

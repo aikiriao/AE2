@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "PluginProcessor.h"
@@ -63,14 +63,14 @@ AE2DistortionAudioProcessorEditor::AE2DistortionAudioProcessorEditor (
     amplifiterBoxLabel.attachToComponent(&amplifiterBox, true);
     addAndMakeVisible(amplifiterBoxLabel);
 
-    // ゲインのdB表記 
+    // ゲインのdB表記
     inGainSlider.textFromValueFunction = [](double value)
         {
             double db = 20.0 * log10(value);
             return juce::String(db) + "dB";
         };
 
-    // ゲインのdB表記を振幅に直す 
+    // ゲインのdB表記を振幅に直す
     inGainSlider.valueFromTextFunction = [](const String &text)
         {
             double db = text.removeCharacters("dB").getDoubleValue();

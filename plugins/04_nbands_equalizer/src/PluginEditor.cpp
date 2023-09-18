@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "PluginProcessor.h"
@@ -82,7 +82,7 @@ AE2NBandsEqualizerAudioProcessorEditor::AE2NBandsEqualizerAudioProcessorEditor (
         addAndMakeVisible(bandGUI.gainSliderLabel);
     }
 
-    // ウィンドウサイズ初期化 
+    // ウィンドウサイズ初期化
     const int activeBandCounts = static_cast<int>(*valueTreeState.getRawParameterValue("nbands"));
     setSize (jmax(minBandsGUIWidth, activeBandCounts * bandGUIWidth), 570);
 }
@@ -101,7 +101,7 @@ void AE2NBandsEqualizerAudioProcessorEditor::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    // 周波数特性の描画 
+    // 周波数特性の描画
     {
         const float mindB = -60.0f;
         const float maxdB = 30.0f;
@@ -119,7 +119,7 @@ void AE2NBandsEqualizerAudioProcessorEditor::paint (juce::Graphics& g)
         const float bottomEdge = frequencyResponseArea.getBottomLeft().y;
         const float numBins = audioProcessor.frequencyResponseBins;
 
-        // 背景を黒で塗る 
+        // 背景を黒で塗る
         g.setColour(backColor);
         g.fillRect(frequencyResponseArea);
 
@@ -136,7 +136,7 @@ void AE2NBandsEqualizerAudioProcessorEditor::paint (juce::Graphics& g)
                 g.drawText(String(dB), leftEdge, lineY - 5, 2 * fontSize, 10, Justification::centred);
             }
         }
-        // スペクトルの縦線 
+        // スペクトルの縦線
         int hz = minHz;
         int hz_unit = static_cast<int>(pow(10.0, floor(log10(minHz))));
         while (hz < maxHz) {
@@ -186,7 +186,7 @@ void AE2NBandsEqualizerAudioProcessorEditor::resized()
     bypassButton.setBounds(0, 0, 80, 30);
     activeFilterBox.setBounds(width - 60, 0, 60, 30);
 
-    // イコライザ要素の描画 
+    // イコライザ要素の描画
     for (int i = 0; i < activeFilterBox.getSelectedId(); i++) {
         struct BandGUIComponent &bandGUI = bandsGUI[i];
         const int bandX = i * bandGUIWidth;
@@ -211,13 +211,13 @@ void AE2NBandsEqualizerAudioProcessorEditor::resized()
 
 void AE2NBandsEqualizerAudioProcessorEditor::buttonClicked(Button *box)
 {
-    // 周波数特性が変わるため再描画 
+    // 周波数特性が変わるため再描画
     repaint();
 }
 
 void AE2NBandsEqualizerAudioProcessorEditor::sliderValueChanged(Slider *slider)
 {
-    // 周波数特性が変わるため再描画 
+    // 周波数特性が変わるため再描画
     repaint();
 }
 
@@ -225,7 +225,7 @@ void AE2NBandsEqualizerAudioProcessorEditor::comboBoxChanged(ComboBox *box)
 {
     const int numActiveBands = activeFilterBox.getSelectedId();
 
-    // 有効なバンド数が変化 
+    // 有効なバンド数が変化
     if (box == &activeFilterBox) {
         setSize(juce::jmax(minBandsGUIWidth, numActiveBands * bandGUIWidth), getHeight());
         resized();
@@ -233,7 +233,7 @@ void AE2NBandsEqualizerAudioProcessorEditor::comboBoxChanged(ComboBox *box)
         return;
     }
 
-    // バンドの種類変更 
+    // バンドの種類変更
     for (int i = 0; i < numActiveBands; i++) {
         if (box == &bandsGUI[i].typeBox) {
             repaint();

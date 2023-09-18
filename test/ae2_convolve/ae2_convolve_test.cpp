@@ -33,7 +33,7 @@ static void DirectConvolve(
 }
 
 static void ConvolveCheckSub(
-        const struct AE2ConvolveInterface *convif, 
+        const struct AE2ConvolveInterface *convif,
         const struct AE2ConvolveConfig *config,
         const float *input, uint32_t num_samples,
         const float *coef, uint32_t num_coefs)
@@ -89,7 +89,7 @@ static void ConvolveCheckSub(
 }
 
 static void ConvolveCheck(
-        const struct AE2ConvolveInterface *convif, 
+        const struct AE2ConvolveInterface *convif,
         const struct AE2ConvolveConfig *config)
 {
     const uint32_t num_input_samples = 8192;

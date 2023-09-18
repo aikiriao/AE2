@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #pragma once
@@ -28,7 +28,7 @@ private:
     void timerCallback() override;
     void mouseDown(const MouseEvent &) override;
 
-    // 軸のスケール 
+    // 軸のスケール
     enum ScaleType {
         Linear = 1,
         Log = 2,
@@ -38,7 +38,7 @@ private:
     // access the processor object that created it.
     AE2SpectrumAnalyzerAudioProcessor& audioProcessor;
 
-    // 型名が長いため型エイリアスを使用 
+    // 型名が長いため型エイリアスを使用
     using ButtonAttachment = AudioProcessorValueTreeState::ButtonAttachment;
     using ComboBoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;
 

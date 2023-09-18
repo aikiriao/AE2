@@ -13,7 +13,7 @@
 /* メモリアラインメント */
 #define AE2FFTCONVOLVE_ALIGNMENT 16
 /* ある整数が2の冪乗か判定. 0:2の冪乗ではない, それ以外:2の冪乗 */
-#define IS_POWER_OF_2(x) (!((x) & ((x) - 1))) 
+#define IS_POWER_OF_2(x) (!((x) & ((x) - 1)))
 /* 最大値を取得 */
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 /* 最小値を取得 */
@@ -24,7 +24,7 @@
 /* FFT畳み込み構造体 */
 struct AE2FFTConvolve {
     uint32_t fft_size; /* FFT点数 */
-    uint32_t partition_size; /* 係数の分割サイズ: fft_size / 2 が成立 */	
+    uint32_t partition_size; /* 係数の分割サイズ: fft_size / 2 が成立 */
     uint32_t num_coefficients; /* 係数長 */
     uint32_t max_num_coefficients; /* 最大係数長 */
     uint32_t num_partitions; /* 係数の分割数: num_coefficients/partition_size が成立 */
@@ -115,7 +115,7 @@ static int32_t AE2FFTConvolve_CalculateWorkSize(const struct AE2ConvolveConfig *
     /* 周波数領域に変換したデータのバッファの領域計算 */
     /* 係数設定時に係数長に合わせたサイズのリングバッファを再構築する */
     buffer_config.max_size = sizeof(float) * max_num_partitions * fft_size;
-    buffer_config.max_required_size = sizeof(float) * fft_size; 
+    buffer_config.max_required_size = sizeof(float) * fft_size;
     freq_buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     if (freq_buffer_work_size < 0) {
         return -1;
@@ -205,7 +205,7 @@ static void* AE2FFTConvolve_Create(const struct AE2ConvolveConfig *config, void 
     /* 周波数領域に変換したデータバッファ */
     /* 係数設定時に係数長に合わせたサイズのリングバッファを再構築する */
     buffer_config.max_size = sizeof(float) * max_num_partitions * fft_size;
-    buffer_config.max_required_size = sizeof(float) * fft_size; 
+    buffer_config.max_required_size = sizeof(float) * fft_size;
     buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     if (buffer_work_size < 0) {
         return NULL;
@@ -274,7 +274,7 @@ static void AE2FFTConvolve_SetCoefficients(void *obj, const float *coefficients,
     /* 周波数領域に変換したデータバッファを再構築 */
     AE2RingBuffer_Destroy(conv->freq_buffer);
     buffer_config.max_size = sizeof(float) * conv->num_partitions * conv->fft_size;
-    buffer_config.max_required_size = sizeof(float) * conv->fft_size; 
+    buffer_config.max_required_size = sizeof(float) * conv->fft_size;
     buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     assert(buffer_work_size > 0);
     conv->freq_buffer = AE2RingBuffer_Create(&buffer_config, conv->freq_buffer_work, buffer_work_size);
@@ -346,7 +346,7 @@ static void AE2FFTConvolve_Convolve(void *obj, const float *input, float *output
         /* 結果を周波数バッファに入力（一番古いデータは消去） */
         AE2RingBuffer_Get(conv->freq_buffer, &buffer_ptr, freqbuffer_unit_size);
         AE2RingBuffer_Put(conv->freq_buffer, conv->work_buffer[0], freqbuffer_unit_size);
-        
+
         /* 係数先頭分を複素乗算/加算 */
         AE2FFTConvolve_MulAddSpectrum(conv->comp_muladd_buffer, conv->work_buffer[0], &conv->ir_freq[0], conv->partition_size);
 

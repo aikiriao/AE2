@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "PluginProcessor.h"
@@ -127,19 +127,19 @@ void AE2SpectrumAnalyzerAudioProcessorEditor::drawFrame(juce::Graphics &g)
     // グリッド線
     g.setColour(frameColor);
     const float dashPattern[2] = {2.0f, 2.0f};
-    // 振幅0の線 
+    // 振幅0の線
     g.drawDashedLine(
         { static_cast<float>(waveArea.getTopLeft().x), static_cast<float>(waveArea.getCentreY()),
         static_cast<float>(waveArea.getTopRight().x), static_cast<float>(waveArea.getCentreY()) },
         dashPattern, 2);
-    // スペクトルの縦線 
+    // スペクトルの縦線
     for (int i = 1; i < numWaveXTicks; i++) {
         const float lineX = waveArea.getTopLeft().x + (i * waveArea.getWidth()) / numWaveXTicks;
         g.drawDashedLine(
             { lineX, static_cast<float>(waveArea.getTopLeft().y), lineX, static_cast<float>(waveArea.getBottomRight().y) },
             dashPattern, 2);
     }
-    // スペクトルの横線 
+    // スペクトルの横線
     for (int i = 1; i < numSpectrumYTicks; i++) {
         const float lineY = spectrumArea.getTopLeft().y + (i * spectrumArea.getHeight()) / numSpectrumYTicks;
         g.drawDashedLine(
@@ -167,7 +167,7 @@ void AE2SpectrumAnalyzerAudioProcessorEditor::drawFrame(juce::Graphics &g)
         }
     } else if (freqScaleType == Log) {
         int deltaHz = minDisplayFrequency;
-        int hz = minDisplayFrequency + deltaHz; // 最低周波数は右枠で表示済み 
+        int hz = minDisplayFrequency + deltaHz; // 最低周波数は右枠で表示済み
         while (hz < maxDisplayFrequency) {
             const float gridX = (float)juce::jmap(log10f(hz),
                 minDisplayFreqencyLog, maxDisplayFreqencyLog, (float)spectrumArea.getTopLeft().x, (float)spectrumArea.getTopRight().x);
@@ -225,8 +225,8 @@ void AE2SpectrumAnalyzerAudioProcessorEditor::drawFrame(juce::Graphics &g)
         const float bottomEdge = waveArea.getBottomLeft().y;
         float waveX, waveY;
         juce::Path path;
-        constexpr int drawPointCounts = 2048; // 描画する最大点数（負荷が高いため点数制限） 
-        const int stride = jmax(1, fftSize / drawPointCounts); // インデックスの飛ばし幅 
+        constexpr int drawPointCounts = 2048; // 描画する最大点数（負荷が高いため点数制限）
+        const int stride = jmax(1, fftSize / drawPointCounts); // インデックスの飛ばし幅
         waveX = jmap(0.0f, 0.0f, fftSize - 1.0f, leftEdge, rightEdge);
         waveY = jlimit(topEdge, bottomEdge, jmap(wave[0], -1.0f, 1.0f, bottomEdge, topEdge));
         path.startNewSubPath(waveX, waveY);
@@ -368,7 +368,7 @@ void AE2SpectrumAnalyzerAudioProcessorEditor::mouseDown(const MouseEvent &e)
                         freqScaleType = Linear;
                     } else if (result == 2) {
                         freqScaleType = Log;
-                        // 対数軸で直流成分を表示すると見ずらくなるため、0を回避 
+                        // 対数軸で直流成分を表示すると見ずらくなるため、0を回避
                         if (minDisplayFrequency == 0) {
                             minDisplayFrequency = 10;
                         }

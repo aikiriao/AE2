@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #pragma once
@@ -14,7 +14,7 @@
 //==============================================================================
 /**
 */
-class AE2NBandsEqualizerAudioProcessorEditor  : public juce::AudioProcessorEditor, Slider::Listener, ComboBox::Listener, Button::Listener 
+class AE2NBandsEqualizerAudioProcessorEditor  : public juce::AudioProcessorEditor, Slider::Listener, ComboBox::Listener, Button::Listener
 {
 public:
     AE2NBandsEqualizerAudioProcessorEditor (AE2NBandsEqualizerAudioProcessor&, AudioProcessorValueTreeState &vts);
@@ -24,16 +24,16 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    // ボタン変化時 
+    // ボタン変化時
     void buttonClicked(Button *box) override;
-    // スライダー変化時 
+    // スライダー変化時
     void sliderValueChanged(Slider *slider) override;
-    // コンボボックス変化時 
+    // コンボボックス変化時
     void comboBoxChanged(ComboBox *box) override;
 
 private:
-    static constexpr int bandGUIWidth = 100; //! バンドあたり要素の幅 
-    static constexpr int minBandsGUIWidth = 3 * bandGUIWidth; //! バンドGUIの最小幅 
+    static constexpr int bandGUIWidth = 100; //! バンドあたり要素の幅
+    static constexpr int minBandsGUIWidth = 3 * bandGUIWidth; //! バンドGUIの最小幅
     static constexpr int maxEqualizerBandsCount = AE2NBandsEqualizerAudioProcessor::maxEqualizerBandsCount;
 
     // This reference is provided as a quick way for your editor to
@@ -56,7 +56,7 @@ private:
     Label activeFilterBoxLabel;
 
     struct BandGUIComponent {
-        //! 有効ボタン 
+        //! 有効ボタン
         ToggleButton activeButton;
         std::unique_ptr<ButtonAttachment> activeButtonAttachment;
         //! タイプ選択ボックス
@@ -75,7 +75,7 @@ private:
         Label gainSliderLabel;
     };
 
-    // 全バンド分のGUI要素 
+    // 全バンド分のGUI要素
     struct BandGUIComponent bandsGUI[maxEqualizerBandsCount];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AE2NBandsEqualizerAudioProcessorEditor)

@@ -23,7 +23,7 @@ juce_add_plugin(${PLUGIN_NAME}
     COMPANY_COPYRIGHT "aikiriao" # コピーライト
     COMPANY_WEBSITE "https://github.com/aikiriao/" # 会社Web
     COMPANY_EMAIL "samuraiaiki@gmail.com" # メールアドレス
-    IS_SYNTH FALSE # 音源生成か否か 
+    IS_SYNTH FALSE # 音源生成か否か
     PLUGIN_MANUFACTURER_CODE CCCC # 最低一文字大文字でプラグインベンダーのIDを指定
     PLUGIN_CODE XXXX # 最低一文字大文字でプラグインのユニークIDを指定
     FORMATS Standalone AU VST3 # ビルド対象のプラグイン

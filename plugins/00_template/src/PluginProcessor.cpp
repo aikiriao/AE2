@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "PluginProcessor.h"
@@ -28,7 +28,7 @@ AE2TemplateAudioProcessor::AE2TemplateAudioProcessor()
                 false),
         })
 {
-    // パラメータと紐づけ 
+    // パラメータと紐づけ
     bypass = parameters.getRawParameterValue("bypass");
 }
 
@@ -143,7 +143,7 @@ void AE2TemplateAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // バイパス判定 
+    // バイパス判定
     if (*bypass > 0.5f) {
         return;
     }

@@ -29,7 +29,7 @@ int32_t AE2RingBuffer_CalculateWorkSize(const struct AE2RingBufferConfig *config
     if (config == NULL) {
         return -1;
     }
-    
+
     /* バッファサイズは要求サイズより大きい */
     if (config->max_size < config->max_required_size) {
         return -1;

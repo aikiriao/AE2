@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "PluginProcessor.h"
@@ -50,7 +50,7 @@ AE2SpectrumAnalyzerAudioProcessor::AE2SpectrumAnalyzerAudioProcessor()
                 false),
         })
 {
-    // パラメータと紐づけ 
+    // パラメータと紐づけ
     bypass = parameters.getRawParameterValue("bypass");
     analyzeChannel = parameters.getRawParameterValue("analyzeChannel");
     fftSize = parameters.getRawParameterValue("fftSize");
@@ -136,13 +136,13 @@ void AE2SpectrumAnalyzerAudioProcessor::changeProgramName (int index, const juce
 //==============================================================================
 void AE2SpectrumAnalyzerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // すでにバッファ作成済みの場合は破棄 
+    // すでにバッファ作成済みの場合は破棄
     if (ringBuffer != NULL) {
         AE2RingBuffer_Destroy(ringBuffer);
         delete[] ringBufferWork;
     }
 
-    // サンプリングレートの保存 
+    // サンプリングレートの保存
     this->sampleRate = sampleRate;
 
     // リングバッファの作成
@@ -198,7 +198,7 @@ void AE2SpectrumAnalyzerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // バイパス判定 
+    // バイパス判定
     if (*bypass > 0.5f) {
         return;
     }
@@ -206,7 +206,7 @@ void AE2SpectrumAnalyzerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // FFTサイズ・窓関数の変更があったら窓関数を更新 
+    // FFTサイズ・窓関数の変更があったら窓関数を更新
     if ((currentFFTSize != getFFTSizeParameterInt())
         || (windowFunctionType != static_cast<int>(*windowFunction))
         || (currentSlideSamples != getNumSlideSamples())) {
@@ -235,7 +235,7 @@ void AE2SpectrumAnalyzerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
         }
     }
 
-    // 分析チャンネルの切り替え 
+    // 分析チャンネルの切り替え
     if (currentAnalyzeChannel != getAnalyzeChannel()) {
         currentAnalyzeChannel = getAnalyzeChannel();
     }
@@ -246,7 +246,7 @@ void AE2SpectrumAnalyzerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
     while (processSamples < sampleCounts) {
         // 挿入するサンプル数
         const int putSamples = jmin(sampleCounts - processSamples, currentSlideSamples);
-        // データをリングバッファに挿入 
+        // データをリングバッファに挿入
         AE2RingBuffer_Put(ringBuffer, &channelData[processSamples], putSamples * sizeof(float));
 
         // FFTサイズ分のデータが溜まったらリングバッファから取り出しFFT実行
@@ -267,9 +267,9 @@ void AE2SpectrumAnalyzerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
             }
             // FFT
             AE2FFT_RealFFT(currentFFTSize, -1, analyzedSpectrum, fftWork);
-            // パワーを計算 
-            analyzedSpectrum[0] = analyzedSpectrum[0] * analyzedSpectrum[0]; // 直流成分 
-            const float nypuistPower = analyzedSpectrum[1] * analyzedSpectrum[1]; // ナイキスト周波数成分 
+            // パワーを計算
+            analyzedSpectrum[0] = analyzedSpectrum[0] * analyzedSpectrum[0]; // 直流成分
+            const float nypuistPower = analyzedSpectrum[1] * analyzedSpectrum[1]; // ナイキスト周波数成分
             for (int bin = 1; bin < currentFFTSize / 2; bin++) {
                 analyzedSpectrum[bin]
                     = AE2FFTCOMPLEX_REAL(analyzedSpectrum, bin) * AE2FFTCOMPLEX_REAL(analyzedSpectrum, bin)
@@ -281,7 +281,7 @@ void AE2SpectrumAnalyzerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
             for (int bin = 0; bin <= currentFFTSize / 2; bin++) {
                 analyzedSpectrum[bin] = 10.0 * log10f(analyzedSpectrum[bin]);
             }
-            // ピークホールド状態の変化 
+            // ピークホールド状態の変化
             if (peakHoldEnable != (*peakHold > 0.5f)) {
                 peakHoldEnable = (*peakHold > 0.5f);
                 // 有効になったときはピークをリセット

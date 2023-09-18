@@ -27,8 +27,8 @@ struct AE2ZeroLatencyFFTConvolve {
     void *time_conv_obj; /* 時間領域畳み込みモジュールオブジェクト本体 */
     void *freq_conv_obj; /* 時間領域畳み込みモジュールオブジェクト本体 */
     uint8_t use_freq_conv; /* 周波数畳み込みを行うか？ */
-    struct AE2RingBuffer *input_buffer; /* 入力遅延バッファ */			
-    float *output_buffer; /* 出力データバッファ */		
+    struct AE2RingBuffer *input_buffer; /* 入力遅延バッファ */
+    float *output_buffer; /* 出力データバッファ */
     uint32_t max_num_input_samples; /* 最大入力サンプル数 */
 };
 

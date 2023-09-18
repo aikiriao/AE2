@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #pragma once
@@ -62,7 +62,7 @@ private:
     std::atomic<float> *bypass = nullptr;   //! バイパスフラグ
     std::atomic<float> *inGain = nullptr;   //! 入力ゲイン
     std::atomic<float> *outLevel = nullptr; //! 出力レベル
-    std::atomic<float> *clippingCurve = nullptr; //! クリッピング曲線モード 
+    std::atomic<float> *clippingCurve = nullptr; //! クリッピング曲線モード
     std::atomic<float> *amplifierConversion = nullptr; //! 振幅モード
 
     //==============================================================================

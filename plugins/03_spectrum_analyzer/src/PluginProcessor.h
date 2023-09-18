@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+==============================================================================
 */
 
 #pragma once
@@ -66,8 +66,8 @@ public:
     ReadWriteLock analyzeLock; //! 解析データの排他制御
     float analyzedWave[maxFFTSize]; //! 解析対象の波形
     float analyzedSpectrum[maxFFTSize]; //! スペクトラム
-    float peakSpectrum[(maxFFTSize / 2) + 1]; //! スペクトラムピーク 
-    bool peakHoldEnable = false; //! ピークホールド有効？ 
+    float peakSpectrum[(maxFFTSize / 2) + 1]; //! スペクトラムピーク
+    bool peakHoldEnable = false; //! ピークホールド有効？
 
     // パラメータ値から実際のFFTサイズに変換
     inline int getFFTSizeParameterInt(void) const
@@ -76,7 +76,7 @@ public:
     }
 
 private:
-    //! 窓関数タイプ 
+    //! 窓関数タイプ
     enum WindowFunctionType
     {
         Rectangular = 0,
@@ -90,17 +90,17 @@ private:
     std::atomic<float> *bypass = nullptr;   //! バイパスフラグ
     std::atomic<float> *fftSize = nullptr; //! FFTサイズ
     std::atomic<float> *windowFunction = nullptr; //! 窓関数
-    std::atomic<float> *slideSizeMs = nullptr; //! スライド幅 
+    std::atomic<float> *slideSizeMs = nullptr; //! スライド幅
     std::atomic<float> *peakHold = nullptr; //! ピークホールド
-    std::atomic<float> *analyzeChannel = nullptr; //! 解析チャンネル 
+    std::atomic<float> *analyzeChannel = nullptr; //! 解析チャンネル
 
     std::atomic<AE2RingBuffer *> ringBuffer = NULL; //! 音声データのリングバッファ
     uint8_t *ringBufferWork = nullptr; //! リングバッファのワーク領域
     float fftWork[maxFFTSize]; //! FFT実行用のワーク領域
     int currentFFTSize = 0; //! 現在のFFTサイズ
     int currentSlideSamples = 0; //! スライド幅
-    float window[maxFFTSize]; //! 窓 
-    double windowSum = maxFFTSize; //! 窓関数の和 
+    float window[maxFFTSize]; //! 窓
+    double windowSum = maxFFTSize; //! 窓関数の和
     int windowFunctionType = Rectangular; //! 窓関数タイプ
 
     // パラメータ値からチャンネルインデックスに変換
