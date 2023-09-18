@@ -79,7 +79,7 @@ target_include_directories(${PLUGIN_NAME}
 
 # コンパイルオプション
 target_compile_definitions(${PLUGIN_NAME}
-    PUBLIC 
+    PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0 # VST2には対応していない（JUCE SDKにVST2.4 SDKが含まれていないため）
     JUCE_WEB_BROWSER=0 # TODO: gtkの環境を準備するのが困難だったため
     )
