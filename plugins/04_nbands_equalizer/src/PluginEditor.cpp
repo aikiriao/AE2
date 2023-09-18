@@ -9,6 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <cfloat>
+
 //==============================================================================
 AE2NBandsEqualizerAudioProcessorEditor::AE2NBandsEqualizerAudioProcessorEditor (
         AE2NBandsEqualizerAudioProcessor& p, AudioProcessorValueTreeState &vts)
