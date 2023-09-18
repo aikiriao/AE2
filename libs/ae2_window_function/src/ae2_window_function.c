@@ -44,10 +44,10 @@ static void AE2WindowFunction_ApplyRectangularWindow(float *data, uint32_t num_s
 static void AE2WindowFunction_ApplyHannWindow(float *data, uint32_t num_samples)
 {
     uint32_t smpl;
-    
+
     assert(data != NULL);
     assert(num_samples > 0);
-    
+
     for (smpl = 0; smpl < num_samples; smpl++) {
             data[smpl] *= AE2WindowFunction_HannWindow(smpl, num_samples);
     }
@@ -57,10 +57,10 @@ static void AE2WindowFunction_ApplyHannWindow(float *data, uint32_t num_samples)
 static void AE2WindowFunction_ApplyHammingWindow(float *data, uint32_t num_samples)
 {
     uint32_t smpl;
-    
+
     assert(data != NULL);
     assert(num_samples > 0);
-    
+
     for (smpl = 0; smpl < num_samples; smpl++) {
             data[smpl] *= AE2WindowFunction_HammingWindow(smpl, num_samples);
     }
@@ -70,10 +70,10 @@ static void AE2WindowFunction_ApplyHammingWindow(float *data, uint32_t num_sampl
 static void AE2WindowFunction_ApplyBlackmanWindow(float *data, uint32_t num_samples)
 {
     uint32_t smpl;
-    
+
     assert(data != NULL);
     assert(num_samples > 0);
-    
+
     for (smpl = 0; smpl < num_samples; smpl++) {
             data[smpl] *= AE2WindowFunction_BlackmanWindow(smpl, num_samples);
     }
