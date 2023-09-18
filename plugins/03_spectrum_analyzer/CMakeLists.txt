@@ -43,6 +43,7 @@ target_include_directories(${PLUGIN_NAME}
     ${PROJECT_ROOT_PATH}/include
     ${PROJECT_ROOT_PATH}/libs/ae2_fft/include
     ${PROJECT_ROOT_PATH}/libs/ae2_ring_buffer/include
+    ${PROJECT_ROOT_PATH}/libs/ae2_window_function/include
     )
 
 # リンクするライブラリ
