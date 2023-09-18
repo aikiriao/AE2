@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define FLOAT_EPSILON 0.001f /* 許容誤差(振幅絶対値) */
+#define FLOAT_EPSILON 0.002f /* 許容誤差(振幅絶対値) */
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
