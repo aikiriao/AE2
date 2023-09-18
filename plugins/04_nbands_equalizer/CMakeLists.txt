@@ -61,6 +61,7 @@ target_link_libraries(${PLUGIN_NAME}
     juce::juce_events
     juce::juce_graphics
     juce::juce_gui_basics
+    juce::juce_gui_extra
     juce::juce_opengl
     juce::juce_product_unlocking
     )
