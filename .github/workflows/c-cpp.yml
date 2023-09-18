@@ -50,19 +50,19 @@ jobs:
 
     - name: Build plugins
       run: |
-        pushd tools/01_simple_convolver
+        pushd plugins/01_simple_convolver
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
-        pushd tools/02_distortion
+        pushd plugins/02_distortion
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
-        pushd tools/03_spectrum_analyzer
+        pushd plugins/03_spectrum_analyzer
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
-        pushd tools/04_nbands_equalizer
+        pushd plugins/04_nbands_equalizer
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
