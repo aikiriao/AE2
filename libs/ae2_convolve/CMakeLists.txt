@@ -36,6 +36,6 @@ else()
 endif()
 set_target_properties(${LIB_NAME}
     PROPERTIES
-    C_STANDARD 90 C_EXTENSIONS OFF
+    C_STANDARD 99 C_EXTENSIONS OFF
     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
     )
