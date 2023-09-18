@@ -227,7 +227,7 @@ TEST(AE2BiquadFilterTest, FilterDesignTest)
             /* 注目する周波数で0.0になることを期待 */
             EXPECT_NEAR(ptest->gain, data[0], 5e-2);
             EXPECT_NEAR(0.0, data[ptest->frequency], 5e-2);
-            EXPECT_TRUE(ptest->gain, data[TEST_NUM_SAMPLES / 2 - 1], 5e-2);
+            EXPECT_NEAR(ptest->gain, data[TEST_NUM_SAMPLES / 2 - 1], 5e-2);
         }
     }
 
