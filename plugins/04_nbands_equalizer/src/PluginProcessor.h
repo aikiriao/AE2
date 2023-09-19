@@ -62,8 +62,8 @@ public:
     static constexpr int frequencyResponseBins = 1024; //! 周波数応答を計算するビン数
     static constexpr float maxGaindB = 30.0; //! 最大のゲイン[dB]
     static constexpr float minGaindB = -30.0; //! 最小のゲイン[dB]
-    double frequencyAmplitudeResponse[frequencyResponseBins]; //! 周波数振幅応答 
-    double frequencyPhaseResponse[frequencyResponseBins]; //! 周波数位相応答 
+    double frequencyAmplitudeResponse[frequencyResponseBins]; //! 周波数振幅応答
+    double frequencyPhaseResponse[frequencyResponseBins]; //! 周波数位相応答
     float samplingRate;
 
     //! パラメータ変更時の動作
