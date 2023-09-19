@@ -301,21 +301,30 @@ void AE2NBandsEqualizerAudioProcessor::recalculateFilterCoefficients(int band)
 
     // 周波数応答の再計算
     for (int i = 0; i < frequencyResponseBins; i++) {
-        frequencyResponse[i] = 0.0;
+        frequencyAmplitudeResponse[i] = frequencyPhaseResponse[i] = 0.0;
     }
     for (int i = 0; i < *bandsCount; i++) {
         if (*bands[i].active > 0.5) {
             const struct AE2BiquadFilter *f = &bands[i].filter[0];
             for (int j = 0; j < frequencyResponseBins; j++) {
                 const double omega0 = (MathConstants<double>::pi * j) / frequencyResponseBins;
-                // TODO: テーブルにしておくといいかも
+                // TODO: sin,cosはテーブルにしておくといいかも
                 const double sinw0 = sin(omega0);
                 const double cosw0 = cos(omega0);
-                const double denom2 = pow(cosw0 + f->a1 + f->a2 * cosw0, 2) + pow(sinw0 - f->a2 * sinw0, 2);
-                const double numer2 = pow(f->b0 * cosw0 + f->b1 + f->b2 * cosw0, 2) + pow(f->b0 * sinw0 - f->b2 * sinw0, 2);
-                frequencyResponse[j] += 10.0 * (log10(numer2) - log10(denom2));
+                const double re_denom = cosw0 + f->a1 + f->a2 * cosw0;
+                const double im_denom = sinw0 - f->a2 * sinw0;
+                const double re_numer = f->b0 * cosw0 + f->b1 + f->b2 * cosw0;
+                const double im_numer = f->b0 * sinw0 - f->b2 * sinw0;
+                frequencyAmplitudeResponse[j]
+                    += 10.0 * (log10(re_numer * re_numer + im_numer * im_numer) - log10(re_denom * re_denom + im_denom * im_denom));
+                frequencyPhaseResponse[j]
+                    += atan2(re_denom * im_numer - re_numer * im_denom, re_numer * re_denom + im_numer * im_denom);
             }
         }
+    }
+    // (-pi, pi]の範囲に丸め込む
+    for (int j = 0; j < frequencyResponseBins; j++) {
+        frequencyPhaseResponse[j] = fmod(frequencyPhaseResponse[j], MathConstants<double>::pi);
     }
 }
 

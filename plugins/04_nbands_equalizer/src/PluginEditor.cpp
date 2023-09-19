@@ -98,7 +98,8 @@ void AE2NBandsEqualizerAudioProcessorEditor::paint (juce::Graphics& g)
 {
     const int width = getWidth();
     const Rectangle<float> frequencyResponseArea(5, 35, width - 10, 200);
-    const double *spec = audioProcessor.frequencyResponse;
+    const double *ampli = audioProcessor.frequencyAmplitudeResponse;
+    const double *phase = audioProcessor.frequencyPhaseResponse;
 
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
@@ -107,11 +108,14 @@ void AE2NBandsEqualizerAudioProcessorEditor::paint (juce::Graphics& g)
     {
         const float mindB = -60.0f;
         const float maxdB = 30.0f;
-        const float minHz = 100.0f;
+        const float minHz = 50.0f;
         const float maxHz = audioProcessor.samplingRate / 2.0;
         const float minHzLog = log10(minHz);
         const float maxHzLog = log10(maxHz);
-        const juce::Colour lineColor = juce::Colour(0, 0xD4, 0);
+        const float minPhase = -180.0f;
+        const float maxPhase = 180.0f;
+        const juce::Colour ampliLineColor = juce::Colour(0, 0xD4, 0);
+        const juce::Colour phaseLineColor = juce::Colour(0, 0, 0xD4);
         const juce::Colour frameColor = juce::Colours::red;
         const juce::Colour backColor = juce::Colours::black;
         const float fontSize = 12.0f;
@@ -132,12 +136,15 @@ void AE2NBandsEqualizerAudioProcessorEditor::paint (juce::Graphics& g)
             const float lineY = jmap(static_cast<float>(dB), mindB, maxdB, bottomEdge, topEdge);
             g.setColour(frameColor);
             g.drawDashedLine({ leftEdge, lineY, rightEdge, lineY }, dashPattern, 2);
-            if (dB % 10 == 0) {
-                g.setFont(fontSize);
-                g.setColour(juce::Colours::white);
-                g.drawText(String(dB), leftEdge, lineY - 5, 2 * fontSize, 10, Justification::centred);
-            }
+            g.setFont(fontSize);
+            g.setColour(juce::Colours::white);
+            g.drawText(String(dB), leftEdge, lineY - 5, 2 * fontSize, 10, Justification::centred);
         }
+        // 位相のテキスト
+        g.drawText(String(-180), rightEdge - 2 * fontSize,                 bottomEdge - 5, 2 * fontSize, 10, Justification::centred);
+        g.drawText(String(   0), rightEdge - 2 * fontSize, (bottomEdge + topEdge) / 2 - 5, 2 * fontSize, 10, Justification::centred);
+        g.drawText(String( 180), rightEdge - 2 * fontSize,                    topEdge - 5, 2 * fontSize, 10, Justification::centred);
+
         // スペクトルの縦線
         int hz = minHz;
         int hz_unit = static_cast<int>(pow(10.0, floor(log10(minHz))));
@@ -163,19 +170,31 @@ void AE2NBandsEqualizerAudioProcessorEditor::paint (juce::Graphics& g)
         }
 
         // 特性のグラフを描画
-        g.setColour(lineColor);
-
-        float fromX = jmap(log10f(FLT_MIN), minHzLog, maxHzLog, leftEdge, rightEdge);
-        float fromY = jmap(static_cast<float>(spec[0]), mindB, maxdB, bottomEdge, topEdge);
-        for (int i = 1; i < numBins; i++) {
-            float binHz = i * audioProcessor.samplingRate / (2 * numBins);
-            float toX = jmap(log10f(binHz), minHzLog, maxHzLog, leftEdge, rightEdge);
-            float toY = jmap(static_cast<float>(spec[i]), mindB, maxdB, bottomEdge, topEdge);
-            if (frequencyResponseArea.contains(Point<float>({ fromX, fromY }))
-                && frequencyResponseArea.contains(Point<float>({ toX, toY }))) {
-                g.drawLine(fromX, fromY, toX, toY, 2.0f);
+        {
+            float fromX = jmap(log10f(FLT_MIN), minHzLog, maxHzLog, leftEdge, rightEdge);
+            float amplFromY = jmap(static_cast<float>(ampli[0]), mindB, maxdB, bottomEdge, topEdge);
+            float phaseFromY = jmap(static_cast<float>(phase[0] * 180.0f / MathConstants<float>::pi), minPhase, maxPhase, bottomEdge, topEdge);
+            for (int i = 1; i < numBins; i++) {
+                float binHz = i * audioProcessor.samplingRate / (2 * numBins);
+                float toX = jmap(log10f(binHz), minHzLog, maxHzLog, leftEdge, rightEdge);
+                float amplToY = jmap(static_cast<float>(ampli[i]), mindB, maxdB, bottomEdge, topEdge);
+                float phaseToY = jmap(static_cast<float>(phase[i] * 180.0f / MathConstants<float>::pi), minPhase, maxPhase, bottomEdge, topEdge);
+                // 位相を先に描く（おそらく振幅の方が重要）
+                if (frequencyResponseArea.contains(Point<float>({ fromX, phaseFromY }))
+                    && frequencyResponseArea.contains(Point<float>({ toX, phaseToY }))) {
+                    g.setColour(phaseLineColor);
+                    g.drawLine(fromX, phaseFromY, toX, phaseToY, 1.5f);
+                }
+                // 振幅特性
+                if (frequencyResponseArea.contains(Point<float>({ fromX, amplFromY }))
+                    && frequencyResponseArea.contains(Point<float>({ toX, amplToY }))) {
+                    g.setColour(ampliLineColor);
+                    g.drawLine(fromX, amplFromY, toX, amplToY, 1.5f);
+                }
+                fromX = toX;
+                amplFromY = amplToY;
+                phaseFromY = phaseToY;
             }
-            fromX = toX; fromY = toY;
         }
     }
 }
