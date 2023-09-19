@@ -225,7 +225,7 @@ void AE2SpectrumAnalyzerAudioProcessorEditor::drawFrame(juce::Graphics &g)
         const float bottomEdge = waveArea.getBottomLeft().y;
         float waveX, waveY;
         juce::Path path;
-        constexpr int drawPointCounts = 2048; // 描画する最大点数（負荷が高いため点数制限）
+        const int drawPointCounts = waveArea.getWidth(); // 描画する最大点数（負荷が高いため点数制限）
         const int stride = jmax(1, fftSize / drawPointCounts); // インデックスの飛ばし幅
         waveX = jmap(0.0f, 0.0f, fftSize - 1.0f, leftEdge, rightEdge);
         waveY = jlimit(topEdge, bottomEdge, jmap(wave[0], -1.0f, 1.0f, bottomEdge, topEdge));
