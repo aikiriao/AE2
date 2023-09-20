@@ -1,0 +1,44 @@
+name: Documentation build by Doxygen
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Preparation
+      run: |
+        sudo apt-get update
+        sudo apt-get install doxygen graphviz
+
+    - name: Build documents
+      run: |
+        cmake -B build -DBUILD_AE2_DOCUMENTATION=ON
+        cmake --build build --target html
+
+    - name: Create artifacts
+      run: |
+        ARTIFACT_ROOT=document
+        mkdir ${ARTIFACT_ROOT} 
+        cp -r build/doc/html/ ${ARTIFACT_ROOT}
+        tar -czf ${ARTIFACT_ROOT}.tar.gz ${ARTIFACT_ROOT} 
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: |
+          document.tar.gz
