@@ -45,50 +45,29 @@ target_include_directories(${PLUGIN_NAME}
 
 # リンクするライブラリ
 if (UNIX)
-    target_link_libraries(${PLUGIN_NAME}
-        PRIVATE
-        ae2
-        juce::juce_audio_basics
-        juce::juce_audio_devices
-        juce::juce_audio_formats
-        juce::juce_audio_plugin_client
-        juce::juce_audio_processors
-        juce::juce_audio_utils
-        juce::juce_core
-        juce::juce_cryptography
-        juce::juce_data_structures
-        juce::juce_dsp
-        juce::juce_events
-        juce::juce_graphics
-        juce::juce_gui_basics
-        juce::juce_gui_extra
-        juce::juce_opengl
-        juce::juce_product_unlocking
-        m
-        curl
-    )
-else()
-    target_link_libraries(${PLUGIN_NAME}
-        PRIVATE
-        ae2
-        juce::juce_audio_basics
-        juce::juce_audio_devices
-        juce::juce_audio_formats
-        juce::juce_audio_plugin_client
-        juce::juce_audio_processors
-        juce::juce_audio_utils
-        juce::juce_core
-        juce::juce_cryptography
-        juce::juce_data_structures
-        juce::juce_dsp
-        juce::juce_events
-        juce::juce_graphics
-        juce::juce_gui_basics
-        juce::juce_gui_extra
-        juce::juce_opengl
-        juce::juce_product_unlocking
-    )
+    set(ADDITIONAL_LIBRARIES m curl)
 endif()
+target_link_libraries(${PLUGIN_NAME}
+    PRIVATE
+    ae2
+    juce::juce_audio_basics
+    juce::juce_audio_devices
+    juce::juce_audio_formats
+    juce::juce_audio_plugin_client
+    juce::juce_audio_processors
+    juce::juce_audio_utils
+    juce::juce_core
+    juce::juce_cryptography
+    juce::juce_data_structures
+    juce::juce_dsp
+    juce::juce_events
+    juce::juce_graphics
+    juce::juce_gui_basics
+    juce::juce_gui_extra
+    juce::juce_opengl
+    juce::juce_product_unlocking
+    ${ADDITIONAL_LIBRARIES}
+)
 
 # JuceHeader.hの自動生成
 juce_generate_juce_header(${PLUGIN_NAME})
