@@ -1,4 +1,4 @@
-name: Documentation build by Doxygen
+name: Documentation build
 
 on:
   schedule:
@@ -22,7 +22,7 @@ jobs:
     - name: Preparation
       run: |
         sudo apt-get update
-        sudo apt-get install doxygen graphviz
+        sudo apt-get install doxygen graphviz libasound2-dev libcurl4-openssl-dev libwebkit2gtk-4.0-dev
 
     - name: Build documents
       run: |
