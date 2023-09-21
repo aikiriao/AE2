@@ -73,7 +73,7 @@ static void AE2FFT_ComplexFFT(int n, const int flag, AE2FFTComplex *x, AE2FFTCom
         const float theta0 = (float)(2.0f * AE2_PI / n);
         AE2FFTComplex j, wdelta, w1p;
         j.real = 0.0f; j.imag = flag;
-        wdelta.real = cosf(theta0); wdelta.imag = -flag * sinf(theta0);
+        wdelta.real = (float)cos(theta0); wdelta.imag = -flag * (float)sin(theta0);
         w1p.real = 1.0f; w1p.imag = 0.0f;
         for (p = 0; p < n1; p++) {
             /* より精密 しかしsin,cosの関数呼び出しがある
@@ -139,8 +139,8 @@ void AE2FFT_RealFFT(int n, const int flag, float *x, float *y)
 {
     int i;
     const float theta = (float)(-flag * 2.0f * AE2_PI / n);
-    const float wpi = sinf(theta);
-    const float wpr = cosf(theta) - 1.0f;
+    const float wpi = (float)sin(theta);
+    const float wpr = (float)cos(theta) - 1.0f;
     const float c2 = (float)flag * 0.5f;
     float wr, wi, wtmp;
 
