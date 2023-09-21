@@ -50,23 +50,23 @@ jobs:
 
     - name: Build plugins
       run: |
-        pushd plugins/00_template
+        pushd plugins/00Template
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
-        pushd plugins/01_simple_convolver
+        pushd plugins/AE2SimpleConvolver
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
-        pushd plugins/02_distortion
+        pushd plugins/AE2Distortion
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
-        pushd plugins/03_spectrum_analyzer
+        pushd plugins/AE2SpectrumAnalyzer
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
-        pushd plugins/04_nbands_equalizer
+        pushd plugins/AE2NBandsEqualizer
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
@@ -79,14 +79,14 @@ jobs:
         pushd ${ARTIFACT_ROOT}
         mkdir plugins
         popd
-        cp -r plugins/01_simple_convolver/build/AE2SimpleConvolver_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
-        cp -r plugins/01_simple_convolver/build/AE2SimpleConvolver_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
-        cp -r plugins/02_distortion/build/AE2Distortion_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
-        cp -r plugins/02_distortion/build/AE2Distortion_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
-        cp -r plugins/03_spectrum_analyzer/build/AE2SpectrumAnalyzer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
-        cp -r plugins/03_spectrum_analyzer/build/AE2SpectrumAnalyzer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
-        cp -r plugins/04_nbands_equalizer/build/AE2NBandsEqualizer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
-        cp -r plugins/04_nbands_equalizer/build/AE2NBandsEqualizer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2SimpleConvolver/build/AE2SimpleConvolver_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2SimpleConvolver/build/AE2SimpleConvolver_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2Distortion/build/AE2Distortion_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2Distortion/build/AE2Distortion_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2SpectrumAnalyzer/build/AE2SpectrumAnalyzer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2SpectrumAnalyzer/build/AE2SpectrumAnalyzer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
         tar -czf ${ARTIFACT_ROOT}.tar.gz ${ARTIFACT_ROOT} 
 
     - name: Create artifacts on Windows platform
@@ -98,14 +98,14 @@ jobs:
         pushd ${ARTIFACT_ROOT}
         mkdir plugins
         popd
-        Copy-Item plugins/01_simple_convolver/build/AE2SimpleConvolver_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
-        Copy-Item plugins/01_simple_convolver/build/AE2SimpleConvolver_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
-        Copy-Item plugins/02_distortion/build/AE2Distortion_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
-        Copy-Item plugins/02_distortion/build/AE2Distortion_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
-        Copy-Item plugins/03_spectrum_analyzer/build/AE2SpectrumAnalyzer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
-        Copy-Item plugins/03_spectrum_analyzer/build/AE2SpectrumAnalyzer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
-        Copy-Item plugins/04_nbands_equalizer/build/AE2NBandsEqualizer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
-        Copy-Item plugins/04_nbands_equalizer/build/AE2NBandsEqualizer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2SimpleConvolver/build/AE2SimpleConvolver_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2SimpleConvolver/build/AE2SimpleConvolver_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2Distortion/build/AE2Distortion_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2Distortion/build/AE2Distortion_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2SpectrumAnalyzer/build/AE2SpectrumAnalyzer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2SpectrumAnalyzer/build/AE2SpectrumAnalyzer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
         tar -czf "${ARTIFACT_ROOT}.tar.gz" ${ARTIFACT_ROOT} 
 
     - name: Upload artifacts

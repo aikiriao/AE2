@@ -6,7 +6,7 @@ import shutil
 import sys
 import os
 
-TEMPLATE_PLUGIN_DIRECTORY = "./00_template"
+TEMPLATE_PLUGIN_DIRECTORY = "./00Template"
 TEMPLATE_PLUGIN_MODULE_NAME = "AE2Template"
 EXTENSION_LIST = [".h", ".cpp", ".txt"]
 
