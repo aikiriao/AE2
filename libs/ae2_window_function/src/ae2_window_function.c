@@ -10,7 +10,7 @@
 /*!
 * @brief ハン窓
 */
-static inline float AE2WindowFunction_HannWindow(uint32_t x, uint32_t window_size)
+static float AE2WindowFunction_HannWindow(uint32_t x, uint32_t window_size)
 {
     return (float)(0.5 * (1.0 - cos((2.0 * AE2_PI * x) / (window_size - 1))));
 }
@@ -18,7 +18,7 @@ static inline float AE2WindowFunction_HannWindow(uint32_t x, uint32_t window_siz
 /*!
 * @brief ハミング窓
 */
-static inline float AE2WindowFunction_HammingWindow(uint32_t x, uint32_t window_size)
+static float AE2WindowFunction_HammingWindow(uint32_t x, uint32_t window_size)
 {
     return (float)(0.54 - 0.46 * cos((2.0 * AE2_PI * x) / (window_size - 1)));
 }
@@ -26,7 +26,7 @@ static inline float AE2WindowFunction_HammingWindow(uint32_t x, uint32_t window_
 /*!
 * @brief ブラックマン窓
 */
-static inline float AE2WindowFunction_BlackmanWindow(uint32_t x, uint32_t window_size)
+static float AE2WindowFunction_BlackmanWindow(uint32_t x, uint32_t window_size)
 {
     return (float)(0.42 - 0.5 * cos((2.0 * AE2_PI * x) / (window_size - 1)) + 0.08 * cos((4.0 * AE2_PI * x) / (window_size - 1)));
 }

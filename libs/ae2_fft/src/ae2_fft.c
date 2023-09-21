@@ -27,7 +27,7 @@ static void AE2FFT_ComplexFFT(int n, int flag, AE2FFTComplex *x, AE2FFTComplex *
 extern char AE2FFT_checksize[(sizeof(AE2FFTComplex) == (sizeof(float) * 2)) ? 1 : -1];
 
 /* 複素数加算 */
-static inline AE2FFTComplex AE2FFTComplex_Add(AE2FFTComplex a, AE2FFTComplex b)
+static AE2FFTComplex AE2FFTComplex_Add(AE2FFTComplex a, AE2FFTComplex b)
 {
     AE2FFTComplex ret;
     ret.real = a.real + b.real;
@@ -36,7 +36,7 @@ static inline AE2FFTComplex AE2FFTComplex_Add(AE2FFTComplex a, AE2FFTComplex b)
 }
 
 /* 複素数減算 */
-static inline AE2FFTComplex AE2FFTComplex_Sub(AE2FFTComplex a, AE2FFTComplex b)
+static AE2FFTComplex AE2FFTComplex_Sub(AE2FFTComplex a, AE2FFTComplex b)
 {
     AE2FFTComplex ret;
     ret.real = a.real - b.real;
@@ -45,7 +45,7 @@ static inline AE2FFTComplex AE2FFTComplex_Sub(AE2FFTComplex a, AE2FFTComplex b)
 }
 
 /* 複素数乗算 */
-static inline AE2FFTComplex AE2FFTComplex_Mul(AE2FFTComplex a, AE2FFTComplex b)
+static AE2FFTComplex AE2FFTComplex_Mul(AE2FFTComplex a, AE2FFTComplex b)
 {
     AE2FFTComplex ret;
     ret.real = a.real * b.real - a.imag * b.imag;
