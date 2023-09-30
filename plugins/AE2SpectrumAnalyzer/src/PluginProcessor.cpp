@@ -150,8 +150,9 @@ void AE2SpectrumAnalyzerAudioProcessor::prepareToPlay (double sampleRate, int sa
     // リングバッファの作成
     AE2RingBufferConfig config;
     const int maxGetSamples = jmax(maxFFTSize, currentSlideSamples);
-    config.max_size = (samplesPerBlock + maxGetSamples) * sizeof(float);
-    config.max_required_size = maxGetSamples * sizeof(float);
+    config.max_ndata = samplesPerBlock + maxGetSamples;
+    config.max_required_ndata = maxGetSamples;
+    config.data_unit_size = sizeof(float);
     const int ringBufferSize = AE2RingBuffer_CalculateWorkSize(&config);
     jassert(ringBufferSize >= 0);
     ringBufferWork = new uint8_t[ringBufferSize];
@@ -249,17 +250,17 @@ void AE2SpectrumAnalyzerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
         // 挿入するサンプル数
         const int putSamples = jmin(sampleCounts - processSamples, currentSlideSamples);
         // データをリングバッファに挿入
-        AE2RingBuffer_Put(ringBuffer, &channelData[processSamples], putSamples * sizeof(float));
+        AE2RingBuffer_Put(ringBuffer, &channelData[processSamples], putSamples);
 
         // FFTサイズ分のデータが溜まったらリングバッファから取り出しFFT実行
-        if (AE2RingBuffer_GetRemainSize(ringBuffer) >= (jmax(currentFFTSize, currentSlideSamples) * sizeof(float))) {
+        if (AE2RingBuffer_GetRemainNumData(ringBuffer) >= jmax(currentFFTSize, currentSlideSamples)) {
             const float regularization_factor = 2.0 / windowSum; // 正規化定数
             void *pdata;
 
             analyzeLock.enterWrite();
 
             // スライド幅だけ取り出しで解析
-            AE2RingBuffer_Get(ringBuffer, &pdata, currentSlideSamples * sizeof(float));
+            AE2RingBuffer_Get(ringBuffer, &pdata, currentSlideSamples);
             memcpy(analyzedSpectrum, pdata, currentFFTSize * sizeof(float));
             memcpy(analyzedWave, pdata, currentFFTSize * sizeof(float));
 
