@@ -146,7 +146,7 @@ TEST(AE2DelayTest, DelayTest)
     /* ディレイ量変更テスト */
     {
         void *work;
-        int32_t work_size, smpl, num_delay_samples, num_feed_samples;
+        int32_t work_size, smpl, num_delay_samples, num_feed_samples, fade_type;
         AE2DelayConfig config;
         struct AE2Delay *delay;
         float test_data[NUM_TEST_DATA_SAMPLES];
@@ -170,37 +170,41 @@ TEST(AE2DelayTest, DelayTest)
             for (num_feed_samples = 1;
                 num_feed_samples <= num_delay_samples;
                 num_feed_samples++) {
-                float data[NUM_TEST_DATA_SAMPLES];
+                for (fade_type = AE2DELAY_FADETYPE_LINEAR;
+                    fade_type <= AE2DELAY_FADETYPE_SQUARE;
+                    fade_type++) {
+                    float data[NUM_TEST_DATA_SAMPLES];
 
-                /* 遅延量設定 */
-                AE2Delay_Reset(delay);
-                /* フェード設定しつつディレイ */
-                AE2Delay_SetDelay(delay,
-                    num_delay_samples, AE2DELAY_FADETYPE_LINEAR, num_feed_samples);
+                    /* 遅延量設定 */
+                    AE2Delay_Reset(delay);
+                    /* フェード設定しつつディレイ */
+                    AE2Delay_SetDelay(delay,
+                        num_delay_samples, (AE2DelayFadeType)fade_type, num_feed_samples);
 
-                /* 信号処理 */
-                memcpy(data, test_data, sizeof(float) * NUM_TEST_DATA_SAMPLES);
-                smpl = 0;
-                while (smpl < NUM_TEST_DATA_SAMPLES) {
-                    const int32_t num_process_samples
-                        = AE2DELAY_MIN(config.max_num_prodess_samples, NUM_TEST_DATA_SAMPLES - smpl);
-                    AE2Delay_Process(delay, &data[smpl], num_process_samples);
-                    smpl += num_process_samples;
-                }
+                    /* 信号処理 */
+                    memcpy(data, test_data, sizeof(float) * NUM_TEST_DATA_SAMPLES);
+                    smpl = 0;
+                    while (smpl < NUM_TEST_DATA_SAMPLES) {
+                        const int32_t num_process_samples
+                            = AE2DELAY_MIN(config.max_num_prodess_samples, NUM_TEST_DATA_SAMPLES - smpl);
+                        AE2Delay_Process(delay, &data[smpl], num_process_samples);
+                        smpl += num_process_samples;
+                    }
 
-                /* 0.0fが続くディレイデータと1.0fが続くデータを補間するので、
-                1.0から始まってフェードが終わるまでデータは減少し続けるはず */
-                {
-                    int32_t is_ok = 1;
-                    for (smpl = 1; smpl < num_feed_samples; smpl++) {
-                        if (smpl < num_delay_samples) {
-                            if (data[smpl] > data[smpl - 1]) {
-                                is_ok = 0;
-                                break;
+                    /* 0.0fが続くディレイデータと1.0fが続くデータを補間するので、
+                    1.0から始まってフェードが終わるまでデータは減少し続けるはず */
+                    {
+                        int32_t is_ok = 1;
+                        for (smpl = 1; smpl < num_feed_samples; smpl++) {
+                            if (smpl < num_delay_samples) {
+                                if (data[smpl] > data[smpl - 1]) {
+                                    is_ok = 0;
+                                    break;
+                                }
                             }
                         }
+                        EXPECT_EQ(1, is_ok);
                     }
-                    EXPECT_EQ(1, is_ok);
                 }
             }
         }
