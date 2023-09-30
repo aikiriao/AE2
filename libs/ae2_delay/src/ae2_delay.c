@@ -154,20 +154,14 @@ static void AE2Delay_ProcessLinearFade(
     int32_t smpl;
     const float delta = delay->delta_ratio;
     float ratio = delay->fade_ratio;
-#if 0
-    /* リファクタ用 */
     const int32_t num_remain_samples = (int32_t)AE2DELAY_MIN(num_samples, (1.0 - ratio) / delta);
-#endif
 
     assert(delay != NULL);
     assert(prev_delay != NULL);
     assert(target_delay != NULL);
     assert(output != NULL);
 
-    for (smpl = 0; smpl < num_samples; smpl++) {
-        if (ratio >= 1.0f) {
-            break;
-        }
+    for (smpl = 0; smpl < num_remain_samples; smpl++) {
         output[smpl] = ratio * target_delay[smpl] + (1.0f - ratio) * prev_delay[smpl];
         ratio += delta;
     }
@@ -185,21 +179,15 @@ static void AE2Delay_ProcessSquareFade(
     int32_t smpl;
     const float delta = delay->delta_ratio;
     float ratio = delay->fade_ratio;
-#if 0
-    /* リファクタ用 */
     const int32_t num_remain_samples = (int32_t)AE2DELAY_MIN(num_samples, (1.0 - ratio) / delta);
-#endif
 
     assert(delay != NULL);
     assert(prev_delay != NULL);
     assert(target_delay != NULL);
     assert(output != NULL);
 
-    for (smpl = 0; smpl < num_samples; smpl++) {
+    for (smpl = 0; smpl < num_remain_samples; smpl++) {
         const float square_ratio = ratio * ratio;
-        if (ratio >= 1.0f) {
-            break;
-        }
         output[smpl] = square_ratio * target_delay[smpl] + (1.0f - square_ratio) * prev_delay[smpl];
         ratio += delta;
     }
