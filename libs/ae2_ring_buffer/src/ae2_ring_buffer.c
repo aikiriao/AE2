@@ -16,6 +16,7 @@ struct AE2RingBuffer {
     uint8_t *data; /* データ領域の先頭ポインタ データは8ビットデータ列と考える */
     size_t buffer_size; /* バッファデータサイズ */
     size_t max_required_size; /* 最大要求データサイズ */
+    size_t data_unit_size; /* 1データのサイズ */
     uint32_t read_pos; /* 読み出し位置 */
     uint32_t write_pos; /* 書き出し位置 */
 };
@@ -30,14 +31,18 @@ int32_t AE2RingBuffer_CalculateWorkSize(const struct AE2RingBufferConfig *config
         return -1;
     }
 
+    /* データサイズが以上 */
+    if (config->data_unit_size == 0) {
+        return -1;
+    }
+
     /* バッファサイズは要求サイズより大きい */
-    if (config->max_size < config->max_required_size) {
+    if (config->max_ndata < config->max_required_ndata) {
         return -1;
     }
 
     work_size = sizeof(struct AE2RingBuffer) + AE2RINGBUFFER_ALIGNMENT;
-    work_size += config->max_size + 1 + AE2RINGBUFFER_ALIGNMENT;
-    work_size += config->max_required_size;
+    work_size += (config->max_ndata + config->max_required_ndata + 1) * config->data_unit_size + AE2RINGBUFFER_ALIGNMENT;
 
     return work_size;
 }
@@ -63,13 +68,14 @@ struct AE2RingBuffer *AE2RingBuffer_Create(const struct AE2RingBufferConfig *con
     work_ptr += sizeof(struct AE2RingBuffer);
 
     /* サイズを記録 */
-    buffer->buffer_size = config->max_size + 1; /* バッファの位置関係を正しく解釈するため1要素分多く確保する（write_pos == read_pos のときデータが一杯なのか空なのか判定できない） */
-    buffer->max_required_size = config->max_required_size;
+    buffer->buffer_size = (config->max_ndata + 1) * config->data_unit_size; /* バッファの位置関係を正しく解釈するため1要素分多く確保する（write_pos == read_pos のときデータが一杯なのか空なのか判定できない） */
+    buffer->data_unit_size = config->data_unit_size;
+    buffer->max_required_size = config->max_required_ndata * config->data_unit_size;
 
     /* バッファ領域割当 */
     work_ptr = (uint8_t *)AE2RINGBUFFER_ROUNDUP((uintptr_t)work_ptr, AE2RINGBUFFER_ALIGNMENT);
     buffer->data = work_ptr;
-    work_ptr += (buffer->buffer_size + config->max_required_size);
+    work_ptr += (buffer->buffer_size + config->max_required_ndata * config->data_unit_size);
 
     /* バッファの内容をクリア */
     AE2RingBuffer_Clear(buffer);
@@ -100,7 +106,7 @@ void AE2RingBuffer_Clear(struct AE2RingBuffer *buffer)
 }
 
 /* リングバッファ内に残ったデータサイズ取得 */
-size_t AE2RingBuffer_GetRemainSize(const struct AE2RingBuffer *buffer)
+static size_t AE2RingBuffer_GetRemainSize(const struct AE2RingBuffer *buffer)
 {
     assert(buffer != NULL);
 
@@ -111,62 +117,78 @@ size_t AE2RingBuffer_GetRemainSize(const struct AE2RingBuffer *buffer)
     return buffer->write_pos - buffer->read_pos;
 }
 
+/* リングバッファ内に残ったデータ数取得 */
+size_t AE2RingBuffer_GetRemainNumData(const struct AE2RingBuffer *buffer)
+{
+    return AE2RingBuffer_GetRemainSize(buffer) / buffer->data_unit_size;
+}
+
 /* リングバッファ内の空き領域サイズ取得 */
-size_t AE2RingBuffer_GetCapacitySize(const struct AE2RingBuffer *buffer)
+size_t AE2RingBuffer_GetCapacityNumData(const struct AE2RingBuffer *buffer)
 {
     assert(buffer != NULL);
     assert(buffer->buffer_size >= AE2RingBuffer_GetRemainSize(buffer));
 
-    /* 実際に入るサイズはバッファサイズより1バイト少ない */
-    return buffer->buffer_size - AE2RingBuffer_GetRemainSize(buffer) - 1;
+    /* 実際に入るサイズはバッファサイズより1個少ない */
+    return (buffer->buffer_size - AE2RingBuffer_GetRemainSize(buffer)) / buffer->data_unit_size - 1;
 }
 
 /* データ挿入 */
 AE2RingBufferApiResult AE2RingBuffer_Put(
-        struct AE2RingBuffer *buffer, const void *data, size_t size)
+        struct AE2RingBuffer *buffer, const void *data, size_t ndata)
 {
+    size_t data_size;
+
     /* 引数チェック */
-    if ((buffer == NULL) || (data == NULL) || (size == 0)) {
+    if ((buffer == NULL) || (data == NULL) || (ndata == 0)) {
         return AE2RINGBUFFER_APIRESULT_INVALID_ARGUMENT;
     }
 
     /* バッファに空き領域がない */
-    if (size > AE2RingBuffer_GetCapacitySize(buffer)) {
+    if (ndata > AE2RingBuffer_GetCapacityNumData(buffer)) {
         return AE2RINGBUFFER_APIRESULT_EXCEED_MAX_CAPACITY;
     }
 
+    /* データサイズに換算 */
+    data_size = buffer->data_unit_size * ndata;
+
     /* リングバッファを巡回するケース: バッファ末尾までまず書き込み */
-    if (buffer->write_pos + size >= buffer->buffer_size) {
+    if ((buffer->write_pos + data_size) >= buffer->buffer_size) {
         uint8_t *wp = buffer->data + buffer->write_pos;
         const size_t data_head_size = buffer->buffer_size - buffer->write_pos;
         memcpy(wp, data, data_head_size);
         data = (const void *)((uint8_t *)data + data_head_size);
-        size -= data_head_size;
+        data_size -= data_head_size;
         buffer->write_pos = 0;
     }
 
     /* 剰余領域への書き込み */
     if (buffer->write_pos < buffer->max_required_size) {
         uint8_t *wp = buffer->data + buffer->buffer_size + buffer->write_pos;
-        const size_t copy_size = AE2RINGBUFFER_MIN(size, buffer->max_required_size - buffer->write_pos);
+        const size_t copy_size = AE2RINGBUFFER_MIN(data_size, buffer->max_required_size - buffer->write_pos);
         memcpy(wp, data, copy_size);
     }
 
     /* リングバッファへの書き込み */
-    memcpy(buffer->data + buffer->write_pos, data, size);
-    buffer->write_pos += size; /* 巡回するケースでインデックスの剰余処理済 */
+    memcpy(buffer->data + buffer->write_pos, data, data_size);
+    buffer->write_pos += data_size; /* 巡回するケースでインデックスの剰余処理済 */
 
     return AE2RINGBUFFER_APIRESULT_OK;
 }
 
 /* データ見るだけ（バッファの状態は更新されない） 注意）バッファが一周する前に使用しないと上書きされる */
 AE2RingBufferApiResult AE2RingBuffer_Peek(
-        const struct AE2RingBuffer *buffer, void **pdata, size_t required_size)
+        const struct AE2RingBuffer *buffer, void **pdata, size_t required_ndata)
 {
+    size_t required_size;
+
     /* 引数チェック */
-    if ((buffer == NULL) || (pdata == NULL) || (required_size == 0)) {
+    if ((buffer == NULL) || (pdata == NULL) || (required_ndata == 0)) {
         return AE2RINGBUFFER_APIRESULT_INVALID_ARGUMENT;
     }
+
+    /* データサイズに換算 */
+    required_size = required_ndata * buffer->data_unit_size;
 
     /* 最大要求サイズを超えている */
     if (required_size > buffer->max_required_size) {
@@ -186,18 +208,56 @@ AE2RingBufferApiResult AE2RingBuffer_Peek(
 
 /* データ取得 注意）バッファが一周する前に使用しないと上書きされる */
 AE2RingBufferApiResult AE2RingBuffer_Get(
-        struct AE2RingBuffer *buffer, void **pdata, size_t required_size)
+        struct AE2RingBuffer *buffer, void **pdata, size_t required_ndata)
 {
     AE2RingBufferApiResult ret;
+    size_t required_size;
 
     /* 読み出し */
-    if ((ret = AE2RingBuffer_Peek(buffer, pdata, required_size)) != AE2RINGBUFFER_APIRESULT_OK) {
+    if ((ret = AE2RingBuffer_Peek(buffer, pdata, required_ndata)) != AE2RINGBUFFER_APIRESULT_OK) {
         return ret;
     }
 
+    /* データサイズに換算 */
+    required_size = required_ndata * buffer->data_unit_size;
+
     /* バッファ参照位置更新 */
-    buffer->read_pos = (buffer->read_pos + (uint32_t)required_size) % buffer->buffer_size;
+    buffer->read_pos = (buffer->read_pos + required_size) % buffer->buffer_size;
 
     return AE2RINGBUFFER_APIRESULT_OK;
 }
 
+/* 遅れたデータの参照 注意）バッファが一周する前に使用しないと上書きされる */
+AE2RingBufferApiResult AE2RingBuffer_DelayedPeek(
+    const struct AE2RingBuffer *buffer, void **pdata, size_t required_ndata, size_t delay_ndata)
+{
+    size_t required_size, delay_offset;
+
+    /* 引数チェック */
+    if ((buffer == NULL) || (pdata == NULL) || (required_ndata == 0)) {
+        return AE2RINGBUFFER_APIRESULT_INVALID_ARGUMENT;
+    }
+
+    /* データサイズに換算 */
+    required_size = required_ndata * buffer->data_unit_size;
+    delay_offset = delay_ndata * buffer->data_unit_size;
+
+    /* 最大要求サイズを超えている */
+    if (required_size > buffer->max_required_size) {
+        return AE2RINGBUFFER_APIRESULT_EXCEED_MAX_REQUIRED;
+    }
+
+    /* 残りデータサイズを超えている */
+    if (required_size > (AE2RingBuffer_GetRemainSize(buffer) + delay_offset)) {
+        return AE2RINGBUFFER_APIRESULT_EXCEED_MAX_REMAIN;
+    }
+
+    /* 遅延データの参照取得 */
+    if (buffer->read_pos >= delay_offset) {
+        (*pdata) = (void *)(buffer->data + buffer->read_pos - delay_offset);
+    } else {
+        (*pdata) = (void *)(buffer->data + buffer->buffer_size + buffer->read_pos - delay_offset);
+    }
+
+    return AE2RINGBUFFER_APIRESULT_OK;
+}

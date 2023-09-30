@@ -104,9 +104,10 @@ static int32_t AE2FFTConvolve_CalculateWorkSize(const struct AE2ConvolveConfig *
     max_num_partitions = max_fft_size / fft_size;
 
     /* 入出力リングバッファの領域計算 */
-    buffer_config.max_size = sizeof(float) * (fft_size + config->max_num_input_samples);
+    buffer_config.max_ndata = fft_size + config->max_num_input_samples;
     /* FFT点数分、もしくは最大サンプル数分拾ってくる場合がある */
-    buffer_config.max_required_size = sizeof(float) * MAX(fft_size, config->max_num_input_samples);
+    buffer_config.max_required_ndata = MAX(fft_size, config->max_num_input_samples);
+    buffer_config.data_unit_size = sizeof(float);
     time_buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     if (time_buffer_work_size < 0) {
         return -1;
@@ -114,8 +115,9 @@ static int32_t AE2FFTConvolve_CalculateWorkSize(const struct AE2ConvolveConfig *
 
     /* 周波数領域に変換したデータのバッファの領域計算 */
     /* 係数設定時に係数長に合わせたサイズのリングバッファを再構築する */
-    buffer_config.max_size = sizeof(float) * max_num_partitions * fft_size;
-    buffer_config.max_required_size = sizeof(float) * fft_size;
+    buffer_config.max_ndata = max_num_partitions * fft_size;
+    buffer_config.max_required_ndata = fft_size;
+    buffer_config.data_unit_size = sizeof(float);
     freq_buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     if (freq_buffer_work_size < 0) {
         return -1;
@@ -190,9 +192,10 @@ static void* AE2FFTConvolve_Create(const struct AE2ConvolveConfig *config, void 
     work_ptr += sizeof(float) * fft_size;
 
     /* 入力/出力データバッファ */
-    buffer_config.max_size = sizeof(float) * (fft_size + config->max_num_input_samples);
+    buffer_config.max_ndata = fft_size + config->max_num_input_samples;
     /* FFT点数分、もしくは最大サンプル数分取得する場合がある */
-    buffer_config.max_required_size = sizeof(float) * MAX(fft_size, config->max_num_input_samples);
+    buffer_config.max_required_ndata = MAX(fft_size, config->max_num_input_samples);
+    buffer_config.data_unit_size = sizeof(float);
     buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     if (buffer_work_size < 0) {
         return NULL;
@@ -204,8 +207,9 @@ static void* AE2FFTConvolve_Create(const struct AE2ConvolveConfig *config, void 
 
     /* 周波数領域に変換したデータバッファ */
     /* 係数設定時に係数長に合わせたサイズのリングバッファを再構築する */
-    buffer_config.max_size = sizeof(float) * max_num_partitions * fft_size;
-    buffer_config.max_required_size = sizeof(float) * fft_size;
+    buffer_config.max_ndata = max_num_partitions * fft_size;
+    buffer_config.max_required_ndata = fft_size;
+    buffer_config.data_unit_size = sizeof(float);
     buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     if (buffer_work_size < 0) {
         return NULL;
@@ -273,8 +277,9 @@ static void AE2FFTConvolve_SetCoefficients(void *obj, const float *coefficients,
 
     /* 周波数領域に変換したデータバッファを再構築 */
     AE2RingBuffer_Destroy(conv->freq_buffer);
-    buffer_config.max_size = sizeof(float) * conv->num_partitions * conv->fft_size;
-    buffer_config.max_required_size = sizeof(float) * conv->fft_size;
+    buffer_config.max_ndata = conv->num_partitions * conv->fft_size;
+    buffer_config.max_required_ndata = conv->fft_size;
+    buffer_config.data_unit_size = sizeof(float);
     buffer_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
     assert(buffer_work_size > 0);
     conv->freq_buffer = AE2RingBuffer_Create(&buffer_config, conv->freq_buffer_work, buffer_work_size);
@@ -288,15 +293,15 @@ static void AE2FFTConvolve_SetCoefficients(void *obj, const float *coefficients,
 static void AE2FFTConvolve_Convolve(void *obj, const float *input, float *output, uint32_t num_samples)
 {
     struct AE2FFTConvolve *conv = (struct AE2FFTConvolve *)obj;
-    const uint32_t input_size = sizeof(float) * num_samples;
-    const uint32_t freqbuffer_unit_size = sizeof(float) * conv->fft_size; /* 周波数データバッファの処理単位 */
+    // const uint32_t input_size = sizeof(float) * num_samples;
+    // const uint32_t freqbuffer_unit_size = sizeof(float) * conv->fft_size; /* 周波数データバッファの処理単位 */
     void *buffer_ptr;
 
     /* 引数チェック */
     assert((obj != NULL) && (input != NULL) && (output != NULL));
 
     /* 入力のバッファリング */
-    AE2RingBuffer_Put(conv->input_buffer, input, input_size);
+    AE2RingBuffer_Put(conv->input_buffer, input, num_samples);
 
     /* バッファサンプル数を増加 */
     conv->buffer_count += num_samples;
@@ -315,11 +320,11 @@ static void AE2FFTConvolve_Convolve(void *obj, const float *input, float *output
             /* バッファ先頭からは最も古い結果が取れるので、係数末尾から畳み込みを行う */
             const uint32_t part_offset = (conv->num_partitions - conv->current_part) * conv->fft_size;
             /* 周波数バッファを取り出す */
-            AE2RingBuffer_Get(conv->freq_buffer, &buffer_ptr, freqbuffer_unit_size);
+            AE2RingBuffer_Get(conv->freq_buffer, &buffer_ptr, conv->fft_size);
             AE2FFTConvolve_MulAddSpectrum(conv->comp_muladd_buffer,
                     (const float *)buffer_ptr, &conv->ir_freq[part_offset], conv->partition_size);
             /* バッファ末尾に再挿入 */
-            AE2RingBuffer_Put(conv->freq_buffer, buffer_ptr, freqbuffer_unit_size);
+            AE2RingBuffer_Put(conv->freq_buffer, buffer_ptr, conv->fft_size);
         }
     }
 
@@ -329,23 +334,23 @@ static void AE2FFTConvolve_Convolve(void *obj, const float *input, float *output
         /* 残った分の複素乗算/加算を実行 */
         for (; conv->current_part < conv->num_partitions; conv->current_part++) {
             const uint32_t part_offset = (conv->num_partitions - conv->current_part) * conv->fft_size;
-            AE2RingBuffer_Get(conv->freq_buffer, &buffer_ptr, freqbuffer_unit_size);
+            AE2RingBuffer_Get(conv->freq_buffer, &buffer_ptr, conv->fft_size);
             AE2FFTConvolve_MulAddSpectrum(conv->comp_muladd_buffer,
                     (const float *)buffer_ptr, &conv->ir_freq[part_offset], conv->partition_size);
-            AE2RingBuffer_Put(conv->freq_buffer, buffer_ptr, freqbuffer_unit_size);
+            AE2RingBuffer_Put(conv->freq_buffer, buffer_ptr, conv->fft_size);
         }
 
         /* 入力バッファからFFTサイズ分データを取り出し */
-        /* FFT点数/2だけバッファを進めるため、取り出しサイズは freqbuffer_unit_size / 2 */
-        AE2RingBuffer_Get(conv->input_buffer, &buffer_ptr, freqbuffer_unit_size / 2);
-        memcpy(conv->work_buffer[0], buffer_ptr, freqbuffer_unit_size); /* 注: 取得するのはfreqbuffer_unit_size */
+        /* FFT点数/2だけバッファを進めるため、取り出しサイズは conv->fft_size / 2 */
+        AE2RingBuffer_Get(conv->input_buffer, &buffer_ptr, conv->fft_size / 2);
+        memcpy(conv->work_buffer[0], buffer_ptr, sizeof(float) * conv->fft_size); /* 注: 取得するのはfreqbuffer_unit_size */
 
         /* FFT */
         AE2FFT_RealFFT((int)conv->fft_size, -1, conv->work_buffer[0], conv->work_buffer[1]);
 
         /* 結果を周波数バッファに入力（一番古いデータは消去） */
-        AE2RingBuffer_Get(conv->freq_buffer, &buffer_ptr, freqbuffer_unit_size);
-        AE2RingBuffer_Put(conv->freq_buffer, conv->work_buffer[0], freqbuffer_unit_size);
+        AE2RingBuffer_Get(conv->freq_buffer, &buffer_ptr, conv->fft_size);
+        AE2RingBuffer_Put(conv->freq_buffer, conv->work_buffer[0], conv->fft_size);
 
         /* 係数先頭分を複素乗算/加算 */
         AE2FFTConvolve_MulAddSpectrum(conv->comp_muladd_buffer, conv->work_buffer[0], &conv->ir_freq[0], conv->partition_size);
@@ -355,10 +360,10 @@ static void AE2FFTConvolve_Convolve(void *obj, const float *input, float *output
 
         /* 結果を出力バッファに書き出す */
         /* FFT畳み込みで有効なのは結果後半のみ（直線畳み込み）。後半のみ出力バッファに書き出す */
-        AE2RingBuffer_Put(conv->output_buffer, &conv->comp_muladd_buffer[conv->fft_size / 2], freqbuffer_unit_size / 2);
+        AE2RingBuffer_Put(conv->output_buffer, &conv->comp_muladd_buffer[conv->fft_size / 2], conv->fft_size / 2);
 
         /* 複素数乗算/加算結果バッファをクリア */
-        memset(conv->comp_muladd_buffer, 0, freqbuffer_unit_size);
+        memset(conv->comp_muladd_buffer, 0, sizeof(float) * conv->fft_size);
 
         /* バッファデータ数を削減 */
         conv->buffer_count -= conv->fft_size / 2;
@@ -368,8 +373,8 @@ static void AE2FFTConvolve_Convolve(void *obj, const float *input, float *output
     }
 
     /* 出力バッファから取り出し */
-    AE2RingBuffer_Get(conv->output_buffer, &buffer_ptr, input_size);
-    memcpy(output, buffer_ptr, input_size);
+    AE2RingBuffer_Get(conv->output_buffer, &buffer_ptr, num_samples);
+    memcpy(output, buffer_ptr, num_samples * sizeof(float));
 }
 
 /* srcとcoefを複素乗算し、dstに足し込む */
@@ -416,13 +421,13 @@ static void AE2FFTConvolve_Reset(void *obj)
 
     /* リングバッファに無音を挿入 */
     /* 補足）最初のFFT点数/2の分はFFTを行うまで出力できないため、無音を入れておく */
-    AE2RingBuffer_Put(conv->input_buffer,  conv->work_buffer[0], fft_buffer_size / 2);
-    AE2RingBuffer_Put(conv->output_buffer, conv->work_buffer[0], fft_buffer_size / 2);
+    AE2RingBuffer_Put(conv->input_buffer,  conv->work_buffer[0], conv->fft_size / 2);
+    AE2RingBuffer_Put(conv->output_buffer, conv->work_buffer[0], conv->fft_size / 2);
 
     /* 周波数領域に変換したデータに0を詰める */
     /* 補足）初回の分割での入力がバッファ末尾に入る様に、分割数-1までを全て0で埋める */
     for (part = 0; part < conv->num_partitions - 1; part++) {
-        AE2RingBuffer_Put(conv->freq_buffer, conv->work_buffer[0], fft_buffer_size);
+        AE2RingBuffer_Put(conv->freq_buffer, conv->work_buffer[0], conv->fft_size);
     }
 
     /* 入力カウントをリセット */

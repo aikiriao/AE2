@@ -17,14 +17,16 @@
 * @brief リングバッファ生成コンフィグ
 */
 struct AE2RingBufferConfig {
-    size_t max_size; /*!< バッファサイズ */
-    size_t max_required_size; /*!< 取り出し最大サイズ */
+    size_t max_ndata; /*!< バッファに入るデータ数 */
+    size_t data_unit_size; /* 1データのサイズ */
+    size_t max_required_ndata; /*!< 取り出し最大データ数 */
+    /* TODO: "サイズ"を個数に変える */
 };
 
 /*!
 * @brief リングバッファAPIの結果型
 */
-typedef enum AE2RingBufferApiResult {
+typedef enum {
     AE2RINGBUFFER_APIRESULT_OK = 0, /*!< 成功 */
     AE2RINGBUFFER_APIRESULT_INVALID_ARGUMENT, /*!< 不正な引数 */
     AE2RINGBUFFER_APIRESULT_EXCEED_MAX_CAPACITY, /*!< 空きサイズを超えて入力しようとした */
@@ -75,50 +77,62 @@ void AE2RingBuffer_Destroy(struct AE2RingBuffer *buffer);
 void AE2RingBuffer_Clear(struct AE2RingBuffer *buffer);
 
 /*!
-* @brief リングバッファ内に残った（入っている）データサイズ取得
+* @brief リングバッファ内に残った（入っている）データ数取得
 * @param[in] buffer リングバッファ
-* @return size_t リングバッファ内に残ったデータサイズ
+* @return size_t リングバッファ内に残ったデータ数
 */
-size_t AE2RingBuffer_GetRemainSize(const struct AE2RingBuffer *buffer);
+size_t AE2RingBuffer_GetRemainNumData(const struct AE2RingBuffer *buffer);
 
 /*!
-* @brief リングバッファ内の空き（入れられる）データサイズ取得
+* @brief リングバッファ内の空き（入れられる）データ数取得
 * @param[in] buffer リングバッファ
-* @return size_t リングバッファ内の空きデータサイズ
+* @return size_t リングバッファ内の空きデータ数
 */
-size_t AE2RingBuffer_GetCapacitySize(const struct AE2RingBuffer *buffer);
+size_t AE2RingBuffer_GetCapacityNumData(const struct AE2RingBuffer *buffer);
 
 /*!
 * @brief データ挿入
 * @param[in,out] buffer リングバッファ
 * @param[in] data 挿入データ
-* @param[in] size 挿入データサイズ
+* @param[in] ndata 挿入データ数
 * @return AE2RingBufferApiResult 実行結果
 */
 AE2RingBufferApiResult AE2RingBuffer_Put(
-        struct AE2RingBuffer *buffer, const void *data, size_t size);
+    struct AE2RingBuffer *buffer, const void *data, size_t ndata);
 
 /*!
 * @brief データを見る（バッファの状態は更新されない）
 * @param[in] buffer リングバッファ
 * @param[out] pdata 取り出したデータの先頭を指すポインタ
-* @param[in] required_size 取り出しデータサイズ
+* @param[in] required_ndata 取り出しデータ数
 * @return AE2RingBufferApiResult 実行結果
 * @attention 取り出した領域は、バッファが一周する前に使用しないと上書きされます
 */
 AE2RingBufferApiResult AE2RingBuffer_Peek(
-        const struct AE2RingBuffer *buffer, void **pdata, size_t required_size);
+    const struct AE2RingBuffer *buffer, void **pdata, size_t required_ndata);
 
 /*!
 * @brief データを取り出す
 * @param[in,out] buffer リングバッファ
 * @param[out] pdata 取り出したデータの先頭を指すポインタ
-* @param[in] required_size 取り出しデータサイズ
+* @param[in] required_size 取り出しデータ数
 * @return AE2RingBufferApiResult 実行結果
 * @attention 取り出した領域は、バッファが一周する前に使用しないと上書きされます
 */
 AE2RingBufferApiResult AE2RingBuffer_Get(
-        struct AE2RingBuffer *buffer, void **pdata, size_t required_size);
+    struct AE2RingBuffer *buffer, void **pdata, size_t required_ndata);
+
+/*!
+* @brief 遅れたデータを見る
+* @param[in] buffer リングバッファ
+* @param[out] pdata 取り出したデータの先頭を指すポインタ
+* @param[in] required_ndata 取り出しデータ数
+* @param[in] delay_ndata 遅れたデータ数
+* @return AE2RingBufferApiResult 実行結果
+* @attention 取り出した領域は、バッファが一周する前に使用しないと上書きされます
+*/
+AE2RingBufferApiResult AE2RingBuffer_DelayedPeek(
+    const struct AE2RingBuffer *buffer, void **pdata, size_t required_ndata, size_t delay_ndata);
 
 #ifdef __cplusplus
 }

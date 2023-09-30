@@ -11,7 +11,7 @@ extern "C" {
 /* 周波数特性計測のためFFT使用 */
 #include "ae2_fft.h"
 
-/* デコードハンドル作成破棄テスト */
+/* ハンドル作成破棄テスト */
 TEST(AE2IIRFilterTest, CreateDestroyTest)
 {
     /* ワークサイズ計算テスト */
@@ -47,20 +47,20 @@ TEST(AE2IIRFilterTest, CreateDestroyTest)
     {
         void *work;
         int32_t work_size;
-        struct AE2IIRFilter *decoder;
+        struct AE2IIRFilter *filter;
 
         work_size = AE2IIRFilter_CalculateWorkSize(1);
         work = malloc(work_size);
 
         /* 引数が不正 */
-        decoder = AE2IIRFilter_Create(1, NULL, work_size);
-        EXPECT_TRUE(decoder == NULL);
-        decoder = AE2IIRFilter_Create(1, work, 0);
-        EXPECT_TRUE(decoder == NULL);
+        filter = AE2IIRFilter_Create(1, NULL, work_size);
+        EXPECT_TRUE(filter == NULL);
+        filter = AE2IIRFilter_Create(1, work, 0);
+        EXPECT_TRUE(filter == NULL);
 
         /* ワークサイズ不足 */
-        decoder = AE2IIRFilter_Create(1, work, work_size - 1);
-        EXPECT_TRUE(decoder == NULL);
+        filter = AE2IIRFilter_Create(1, work, work_size - 1);
+        EXPECT_TRUE(filter == NULL);
 
         free(work);
     }

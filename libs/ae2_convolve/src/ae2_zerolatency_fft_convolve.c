@@ -94,8 +94,9 @@ static int32_t AE2ZeroLatencyFFTConvolve_CalculateWorkSize(const struct AE2Convo
     }
 
     /* ディレイバッファ分 */
-    buffer_config.max_size = sizeof(float) * (config->max_num_input_samples + AE2BARACONVOLVE_NUM_TIMEDOMAIN_COEFFICIENTS);
-    buffer_config.max_required_size = sizeof(float) * config->max_num_input_samples;
+    buffer_config.max_ndata = config->max_num_input_samples + AE2BARACONVOLVE_NUM_TIMEDOMAIN_COEFFICIENTS;
+    buffer_config.max_required_ndata = config->max_num_input_samples;
+    buffer_config.data_unit_size = sizeof(float);
     delay_buffer_size = AE2RingBuffer_CalculateWorkSize(&buffer_config);
 
     work_size = sizeof(struct AE2ZeroLatencyFFTConvolve) + AE2BARACONVOLVE_ALIGNMENT;
@@ -152,8 +153,9 @@ static void* AE2ZeroLatencyFFTConvolve_Create(const struct AE2ConvolveConfig *co
     work_ptr += tmp_work_size;
 
     /* ディレイバッファ */
-    buffer_config.max_size = sizeof(float) * (config->max_num_input_samples + AE2BARACONVOLVE_NUM_TIMEDOMAIN_COEFFICIENTS);
-    buffer_config.max_required_size = sizeof(float) * config->max_num_input_samples;
+    buffer_config.max_ndata = config->max_num_input_samples + AE2BARACONVOLVE_NUM_TIMEDOMAIN_COEFFICIENTS;
+    buffer_config.max_required_ndata = config->max_num_input_samples;
+    buffer_config.data_unit_size = sizeof(float);
     if ((tmp_work_size = AE2RingBuffer_CalculateWorkSize(&buffer_config)) < 0) {
         return NULL;
     }
@@ -215,12 +217,12 @@ static void AE2ZeroLatencyFFTConvolve_Convolve(void *obj, const float *input, fl
     if (conv->use_freq_conv == 1) {
         void *buffer_ptr;
         uint32_t smpl;
-        const uint32_t sample_size = sizeof(float) * num_samples;
+        // const uint32_t sample_size = sizeof(float) * num_samples;
 
         /* ディレイバッファに入力 */
-        AE2RingBuffer_Put(conv->input_buffer, input, sample_size);
+        AE2RingBuffer_Put(conv->input_buffer, input, num_samples);
         /* ディレイバッファから遅延入力を取得/畳み込み */
-        AE2RingBuffer_Get(conv->input_buffer, &buffer_ptr, sample_size);
+        AE2RingBuffer_Get(conv->input_buffer, &buffer_ptr, num_samples);
         conv->freq_conv_if->Convolve(conv->freq_conv_obj, (const float *)buffer_ptr, conv->output_buffer, num_samples);
 
         /* 時間領域の結果とミックス */
@@ -250,7 +252,7 @@ static void AE2ZeroLatencyFFTConvolve_Reset(void *obj)
     smpl = 0;
     while (smpl < num_input_delay) {
         const uint32_t num_samples = MIN(conv->max_num_input_samples, (uint32_t)(num_input_delay - smpl));
-        AE2RingBuffer_Put(conv->input_buffer, conv->output_buffer, sizeof(float) * num_samples);
+        AE2RingBuffer_Put(conv->input_buffer, conv->output_buffer, num_samples);
         smpl += num_samples;
     }
 }
