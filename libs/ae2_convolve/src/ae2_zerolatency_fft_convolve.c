@@ -217,7 +217,6 @@ static void AE2ZeroLatencyFFTConvolve_Convolve(void *obj, const float *input, fl
     if (conv->use_freq_conv == 1) {
         void *buffer_ptr;
         uint32_t smpl;
-        // const uint32_t sample_size = sizeof(float) * num_samples;
 
         /* ディレイバッファに入力 */
         AE2RingBuffer_Put(conv->input_buffer, input, num_samples);
