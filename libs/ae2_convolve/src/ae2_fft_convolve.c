@@ -293,8 +293,6 @@ static void AE2FFTConvolve_SetCoefficients(void *obj, const float *coefficients,
 static void AE2FFTConvolve_Convolve(void *obj, const float *input, float *output, uint32_t num_samples)
 {
     struct AE2FFTConvolve *conv = (struct AE2FFTConvolve *)obj;
-    // const uint32_t input_size = sizeof(float) * num_samples;
-    // const uint32_t freqbuffer_unit_size = sizeof(float) * conv->fft_size; /* 周波数データバッファの処理単位 */
     void *buffer_ptr;
 
     /* 引数チェック */
