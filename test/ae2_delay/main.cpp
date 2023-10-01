@@ -18,7 +18,7 @@ TEST(AE2DelayTest, CreateDestroyTest)
 
         /* 簡単な成功例 */
         config.max_num_delay_samples = 1;
-        config.max_num_prodess_samples = 1;
+        config.max_num_process_samples = 1;
         work_size = AE2Delay_CalculateWorkSize(&config);
         EXPECT_TRUE(work_size >= (int32_t)sizeof(struct AE2Delay));
 
@@ -35,7 +35,7 @@ TEST(AE2DelayTest, CreateDestroyTest)
         struct AE2Delay *delay;
 
         config.max_num_delay_samples = 1;
-        config.max_num_prodess_samples = 1;
+        config.max_num_process_samples = 1;
         work_size = AE2Delay_CalculateWorkSize(&config);
         work = malloc(work_size);
 
@@ -54,7 +54,7 @@ TEST(AE2DelayTest, CreateDestroyTest)
         struct AE2Delay *delay;
 
         config.max_num_delay_samples = 1;
-        config.max_num_prodess_samples = 1;
+        config.max_num_process_samples = 1;
         work_size = AE2Delay_CalculateWorkSize(&config);
         work = malloc(work_size);
 
@@ -87,7 +87,7 @@ TEST(AE2DelayTest, DelayTest)
         float test_data[NUM_TEST_DATA_SAMPLES];
 
         config.max_num_delay_samples = NUM_TEST_DATA_SAMPLES;
-        config.max_num_prodess_samples = 10;
+        config.max_num_process_samples = 10;
         work_size = AE2Delay_CalculateWorkSize(&config);
         work = malloc(work_size);
 
@@ -114,7 +114,7 @@ TEST(AE2DelayTest, DelayTest)
             smpl = 0;
             while (smpl < NUM_TEST_DATA_SAMPLES) {
                 const int32_t num_process_samples
-                    = AE2DELAY_MIN(config.max_num_prodess_samples, NUM_TEST_DATA_SAMPLES - smpl);
+                    = AE2DELAY_MIN(config.max_num_process_samples, NUM_TEST_DATA_SAMPLES - smpl);
                 AE2Delay_Process(delay, &data[smpl], num_process_samples);
                 smpl += num_process_samples;
             }
@@ -152,7 +152,7 @@ TEST(AE2DelayTest, DelayTest)
         float test_data[NUM_TEST_DATA_SAMPLES];
 
         config.max_num_delay_samples = NUM_TEST_DATA_SAMPLES;
-        config.max_num_prodess_samples = 10;
+        config.max_num_process_samples = 10;
         work_size = AE2Delay_CalculateWorkSize(&config);
         work = malloc(work_size);
 
@@ -186,7 +186,7 @@ TEST(AE2DelayTest, DelayTest)
                     smpl = 0;
                     while (smpl < NUM_TEST_DATA_SAMPLES) {
                         const int32_t num_process_samples
-                            = AE2DELAY_MIN(config.max_num_prodess_samples, NUM_TEST_DATA_SAMPLES - smpl);
+                            = AE2DELAY_MIN(config.max_num_process_samples, NUM_TEST_DATA_SAMPLES - smpl);
                         AE2Delay_Process(delay, &data[smpl], num_process_samples);
                         smpl += num_process_samples;
                     }

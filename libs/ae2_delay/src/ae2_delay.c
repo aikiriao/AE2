@@ -44,8 +44,8 @@ int32_t AE2Delay_CalculateWorkSize(const struct AE2DelayConfig *config)
         int32_t buffer_size;
         struct AE2RingBufferConfig buffer_config;
         /* 遅延分の保持と、最大遅延分遡れるように2倍確保 */
-        buffer_config.max_ndata = AE2DELAY_MAX(2 * config->max_num_delay_samples, config->max_num_prodess_samples);
-        buffer_config.max_required_ndata = config->max_num_prodess_samples;
+        buffer_config.max_ndata = AE2DELAY_MAX(2 * config->max_num_delay_samples, config->max_num_process_samples);
+        buffer_config.max_required_ndata = config->max_num_process_samples;
         buffer_config.data_unit_size = sizeof(float);
         if ((buffer_size = AE2RingBuffer_CalculateWorkSize(&buffer_config)) < 0) {
             return -1;
@@ -74,7 +74,7 @@ struct AE2Delay *AE2Delay_Create(const struct AE2DelayConfig *config, void *work
     /* ハンドル領域割当 */
     work_ptr = (uint8_t *)AE2DELAY_ROUNDUP((uintptr_t)work, AE2DELAY_ALIGNMENT);
     delay = (struct AE2Delay *)work_ptr;
-    delay->max_num_process_samples = config->max_num_prodess_samples;
+    delay->max_num_process_samples = config->max_num_process_samples;
     delay->max_num_delay_samples = config->max_num_delay_samples;
     work_ptr += sizeof(struct AE2Delay);
 
@@ -82,8 +82,8 @@ struct AE2Delay *AE2Delay_Create(const struct AE2DelayConfig *config, void *work
     {
         int32_t buffer_size;
         struct AE2RingBufferConfig buffer_config;
-        buffer_config.max_ndata = AE2DELAY_MAX(2 * config->max_num_delay_samples, config->max_num_prodess_samples);
-        buffer_config.max_required_ndata = config->max_num_prodess_samples;
+        buffer_config.max_ndata = AE2DELAY_MAX(2 * config->max_num_delay_samples, config->max_num_process_samples);
+        buffer_config.max_required_ndata = config->max_num_process_samples;
         buffer_config.data_unit_size = sizeof(float);
         if ((buffer_size = AE2RingBuffer_CalculateWorkSize(&buffer_config)) < 0) {
             return NULL;

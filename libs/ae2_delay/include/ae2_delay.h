@@ -12,7 +12,7 @@
 */
 struct AE2DelayConfig {
     int32_t max_num_delay_samples; /*!< 最大遅延量 */
-    int32_t max_num_prodess_samples; /*!< 最大処理サンプルサイズ */
+    int32_t max_num_process_samples; /*!< 最大処理サンプルサイズ */
     /* TODO: タップ数 */
 };
 
@@ -35,7 +35,7 @@ extern "C" {
 
 /*!
 * @brief ディレイ作成に必要なワークサイズ計算
-* @param[in] max_num_delay_samples 最大ディレイサンプル数
+* @param[in] config ディレイ生成コンフィグ
 * @return int32_t 計算に成功した場合は0以上の値を、失敗した場合は負の値を返します
 * @sa AE2Delay_Create
 */
@@ -43,7 +43,7 @@ int32_t AE2Delay_CalculateWorkSize(const struct AE2DelayConfig *config);
 
 /*!
 * @brief ディレイ作成
-* @param[in] max_num_delay_samples 最大ディレイサンプル数
+* @param[in] config ディレイ生成コンフィグ
 * @param[in,out] work ディレイ生成に使用するワーク領域
 * @param[in] work_size ディレイ生成に使用するワーク領域サイズ
 * @return AE2Delay 生成に成功した場合は構造体のポインタを、失敗した場合はNULLを返します
