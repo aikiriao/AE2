@@ -1,5 +1,6 @@
 #include "ae2_delay.h"
 
+#include <math.h>
 #include <string.h>
 #include <assert.h>
 
@@ -154,7 +155,7 @@ static void AE2Delay_ProcessLinearFade(
     int32_t smpl;
     const float delta = delay->delta_ratio;
     float ratio = delay->fade_ratio;
-    const int32_t num_remain_samples = (int32_t)AE2DELAY_MIN(num_samples, (1.0 - ratio) / delta);
+    const int32_t num_remain_samples = (int32_t)AE2DELAY_MIN(num_samples, ceil((1.0 - ratio) / delta));
 
     assert(delay != NULL);
     assert(prev_delay != NULL);
@@ -179,7 +180,7 @@ static void AE2Delay_ProcessSquareFade(
     int32_t smpl;
     const float delta = delay->delta_ratio;
     float ratio = delay->fade_ratio;
-    const int32_t num_remain_samples = (int32_t)AE2DELAY_MIN(num_samples, (1.0 - ratio) / delta);
+    const int32_t num_remain_samples = (int32_t)AE2DELAY_MIN(num_samples, ceil((1.0 - ratio) / delta));
 
     assert(delay != NULL);
     assert(prev_delay != NULL);
