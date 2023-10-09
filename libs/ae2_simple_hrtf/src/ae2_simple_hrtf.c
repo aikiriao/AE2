@@ -149,9 +149,6 @@ static void AE2SimpleHRTF_SetParameter(struct AE2SimpleHRTF *hrtf, float radius,
     /* 周波数パラメータ */
     const double omega0 = SPEED_OF_SOUND / radius;
 
-    /* リスナー正面からの角度に直す */
-    // angle += AE2_PI / 2.0;
-
     /* IIRフィルタ係数設定 */
     {
         const double alpha = 1.0 + alpha_min / 2.0 + (1.0 - alpha_min / 2.0) * cos(angle / theta_min * AE2_PI);

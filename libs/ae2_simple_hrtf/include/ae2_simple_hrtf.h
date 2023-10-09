@@ -71,7 +71,7 @@ void AE2SimpleHRTF_SetHeadRadius(struct AE2SimpleHRTF *hrtf, float radius);
 /*!
 * @brief 水平方向角度の設定
 * @param[in,out] hrtf HRTFハンドル
-* @param[in] angle "音源-頭部中心" と "音源-観測点" がなす角（ラジアン）
+* @param[in] angle "頭部中心-音源" と "頭部中心-観測点" がなす角（ラジアン）
 * @sa AE2SimpleHRTF_SetHeadRadius
 */
 void AE2SimpleHRTF_SetAzimuthAngle(struct AE2SimpleHRTF *hrtf, float angle);
