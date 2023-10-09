@@ -23,8 +23,8 @@ struct AE2Delay {
     int32_t max_num_process_samples; /* 最大処理サンプル数 */
     int32_t max_num_delay_samples; /* 最大遅延サンプル数 */
     AE2DelayFadeType fade_type; /* フェードの種類 */
-    int32_t delay_num_samples; /* 現在の遅延量 */
-    int32_t prev_delay_num_samples; /* 前の遅延量 */
+    float delay_num_samples; /* 現在の遅延量 */
+    float prev_delay_num_samples; /* 前の遅延量 */
 };
 
 /* ディレイ作成に必要なワークサイズ計算 */
@@ -118,12 +118,12 @@ void AE2Delay_Reset(struct AE2Delay *delay)
     delay->fade_ratio = 0.0f;
 
     /* 遅延量をクリア */
-    delay->delay_num_samples = delay->prev_delay_num_samples = 0;
+    delay->delay_num_samples = delay->prev_delay_num_samples = 0.0f;
 }
 
 /* 遅延量を設定 */
 void AE2Delay_SetDelay(struct AE2Delay *delay,
-        int32_t num_delay_samples, AE2DelayFadeType fade_type, int32_t num_fade_samples)
+        float num_delay_samples, AE2DelayFadeType fade_type, int32_t num_fade_samples)
 {
     assert(delay != NULL);
     assert(num_delay_samples >= 0);
@@ -150,7 +150,10 @@ void AE2Delay_SetDelay(struct AE2Delay *delay,
 
 /* 線形補間による遅延フェード */
 static void AE2Delay_ProcessLinearFade(
-    struct AE2Delay *delay, const float *prev_delay, const float *target_delay, float *output, int32_t num_samples)
+    struct AE2Delay *delay,
+    const float *prev_delay, float prev_delay_fraction,
+    const float *target_delay, float target_delay_fraction,
+    float *output, int32_t num_samples)
 {
     int32_t smpl;
     const float delta = delay->delta_ratio;
@@ -161,9 +164,15 @@ static void AE2Delay_ProcessLinearFade(
     assert(prev_delay != NULL);
     assert(target_delay != NULL);
     assert(output != NULL);
+    assert((prev_delay_fraction >= 0.0f) && (prev_delay_fraction < 1.0f));
+    assert((target_delay_fraction >= 0.0f) && (target_delay_fraction < 1.0f));
 
     for (smpl = 0; smpl < num_remain_samples; smpl++) {
-        output[smpl] = ratio * target_delay[smpl] + (1.0f - ratio) * prev_delay[smpl];
+        /* サンプルを線形補間 */
+        const float pre_delay = (1.0f - prev_delay_fraction) * prev_delay[smpl] + prev_delay_fraction * prev_delay[smpl + 1];
+        const float tgt_delay = (1.0f - target_delay_fraction) * target_delay[smpl] + target_delay_fraction * target_delay[smpl + 1];
+        /* フェード適用 */
+        output[smpl] = ratio * tgt_delay + (1.0f - ratio) * pre_delay;
         ratio += delta;
     }
     if (smpl < num_samples) {
@@ -175,7 +184,10 @@ static void AE2Delay_ProcessLinearFade(
 
 /* 線形補間による遅延フェード */
 static void AE2Delay_ProcessSquareFade(
-    struct AE2Delay *delay, const float *prev_delay, const float *target_delay, float *output, int32_t num_samples)
+    struct AE2Delay *delay,
+    const float *prev_delay, float prev_delay_fraction,
+    const float *target_delay, float target_delay_fraction,
+    float *output, int32_t num_samples)
 {
     int32_t smpl;
     const float delta = delay->delta_ratio;
@@ -186,10 +198,14 @@ static void AE2Delay_ProcessSquareFade(
     assert(prev_delay != NULL);
     assert(target_delay != NULL);
     assert(output != NULL);
+    assert((prev_delay_fraction >= 0.0f) && (prev_delay_fraction < 1.0f));
+    assert((target_delay_fraction >= 0.0f) && (target_delay_fraction < 1.0f));
 
     for (smpl = 0; smpl < num_remain_samples; smpl++) {
         const float square_ratio = ratio * ratio;
-        output[smpl] = square_ratio * target_delay[smpl] + (1.0f - square_ratio) * prev_delay[smpl];
+        const float pre_delay = (1.0f - prev_delay_fraction) * prev_delay[smpl] + prev_delay_fraction * prev_delay[smpl + 1];
+        const float tgt_delay = (1.0f - target_delay_fraction) * target_delay[smpl] + target_delay_fraction * target_delay[smpl + 1];
+        output[smpl] = square_ratio * tgt_delay + (1.0f - square_ratio) * pre_delay;
         ratio += delta;
     }
     if (smpl < num_samples) {
@@ -204,6 +220,7 @@ void AE2Delay_Process(struct AE2Delay *delay, float *data, int32_t num_samples)
 {
     int32_t smpl;
     float *target_delay, *prev_delay;
+    float target_delay_fraction, prev_delay_fraction;
 
     assert(delay != NULL);
     assert(data != NULL);
@@ -213,16 +230,24 @@ void AE2Delay_Process(struct AE2Delay *delay, float *data, int32_t num_samples)
     AE2RingBuffer_Put(delay->buffer, data, num_samples);
 
     /* 変更前の遅延と変更後の遅延を取得 */
-    AE2RingBuffer_DelayedPeek(delay->buffer, (void **)&prev_delay, num_samples, delay->prev_delay_num_samples);
-    AE2RingBuffer_DelayedPeek(delay->buffer, (void **)&target_delay, num_samples, delay->delay_num_samples);
+    AE2RingBuffer_DelayedPeek(delay->buffer, (void **)&prev_delay, num_samples, (int32_t)ceil(delay->prev_delay_num_samples));
+    AE2RingBuffer_DelayedPeek(delay->buffer, (void **)&target_delay, num_samples, (int32_t)ceil(delay->delay_num_samples));
+
+    /* 遅延サンプル数の小数部を取得 */
+    prev_delay_fraction = delay->prev_delay_num_samples - floor(delay->prev_delay_num_samples);
+    target_delay_fraction = delay->delay_num_samples - floor(delay->delay_num_samples);
+    assert((prev_delay_fraction >= 0.0f) && (prev_delay_fraction < 1.0f));
+    assert((target_delay_fraction >= 0.0f) && (target_delay_fraction < 1.0f));
 
     /* ミックスしながら出力 */
     switch (delay->fade_type) {
     case AE2DELAY_FADETYPE_LINEAR:
-        AE2Delay_ProcessLinearFade(delay, prev_delay, target_delay, data, num_samples);
+        AE2Delay_ProcessLinearFade(delay,
+            prev_delay, prev_delay_fraction, target_delay, target_delay_fraction, data, num_samples);
         break;
     case AE2DELAY_FADETYPE_SQUARE:
-        AE2Delay_ProcessSquareFade(delay, prev_delay, target_delay, data, num_samples);
+        AE2Delay_ProcessSquareFade(delay,
+            prev_delay, prev_delay_fraction, target_delay, target_delay_fraction, data, num_samples);
         break;
     default:
         assert(0);

@@ -73,7 +73,7 @@ void AE2Delay_Reset(struct AE2Delay *delay);
 * @param[in] num_fade_samples フェードサンプル数（0は即時変更）
 */
 void AE2Delay_SetDelay(struct AE2Delay *delay,
-    int32_t num_delay_samples, AE2DelayFadeType fade_type, int32_t num_fade_samples);
+    float num_delay_samples, AE2DelayFadeType fade_type, int32_t num_fade_samples);
 
 /*!
 * @brief 信号処理(in-place)
