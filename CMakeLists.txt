@@ -14,6 +14,8 @@ add_library(${LIB_NAME}
     $<TARGET_OBJECTS:ae2_window_function>
     $<TARGET_OBJECTS:ae2_iir_filter>
     $<TARGET_OBJECTS:ae2_convolve>
+    $<TARGET_OBJECTS:ae2_delay>
+    $<TARGET_OBJECTS:ae2_simple_hrtf>
     )
 
 # 依存するプロジェクト
