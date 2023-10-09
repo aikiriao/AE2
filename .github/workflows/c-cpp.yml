@@ -70,6 +70,10 @@ jobs:
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
         popd
+        pushd plugins/AE2Pannner
+        cmake -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
+        popd
 
     - name: Create artifacts on UNIX platform
       if: runner.os == 'Linux' || runner.os == 'macOS'
@@ -87,6 +91,8 @@ jobs:
         cp -r plugins/AE2SpectrumAnalyzer/build/AE2SpectrumAnalyzer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
         cp -r plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
         cp -r plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2NBandsEqualizer/build/AE2Pannner_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/
+        cp -r plugins/AE2NBandsEqualizer/build/AE2Pannner_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/
         tar -czf ${ARTIFACT_ROOT}.tar.gz ${ARTIFACT_ROOT} 
 
     - name: Create artifacts on Windows platform
@@ -106,6 +112,8 @@ jobs:
         Copy-Item plugins/AE2SpectrumAnalyzer/build/AE2SpectrumAnalyzer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
         Copy-Item plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
         Copy-Item plugins/AE2NBandsEqualizer/build/AE2NBandsEqualizer_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2NBandsEqualizer/build/AE2Pannner_artefacts/Release/VST3 ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
+        Copy-Item plugins/AE2NBandsEqualizer/build/AE2Pannner_artefacts/Release/Standalone ${ARTIFACT_ROOT}/plugins/ -Recurse -Force
         tar -czf "${ARTIFACT_ROOT}.tar.gz" ${ARTIFACT_ROOT} 
 
     - name: Upload artifacts
