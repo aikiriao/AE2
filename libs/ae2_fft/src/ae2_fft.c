@@ -4,6 +4,15 @@
 #include <math.h>
 #include <assert.h>
 
+/* インラインキーワードを定義 */
+#if defined(_MSC_VER)
+#define AE2FFT_INLINE inline
+#elif defined(__GNUC__)
+#define AE2FFT_INLINE __inline__
+#else
+#define AE2FFT_INLINE
+#endif
+
 /* 円周率 */
 #define AE2_PI 3.14159265358979323846
 
@@ -27,7 +36,7 @@ static void AE2FFT_ComplexFFT(int n, int flag, AE2FFTComplex *x, AE2FFTComplex *
 extern char AE2FFT_checksize[(sizeof(AE2FFTComplex) == (sizeof(float) * 2)) ? 1 : -1];
 
 /* 複素数加算 */
-static AE2FFTComplex AE2FFTComplex_Add(AE2FFTComplex a, AE2FFTComplex b)
+static AE2FFT_INLINE AE2FFTComplex AE2FFTComplex_Add(AE2FFTComplex a, AE2FFTComplex b)
 {
     AE2FFTComplex ret;
     ret.real = a.real + b.real;
@@ -36,7 +45,7 @@ static AE2FFTComplex AE2FFTComplex_Add(AE2FFTComplex a, AE2FFTComplex b)
 }
 
 /* 複素数減算 */
-static AE2FFTComplex AE2FFTComplex_Sub(AE2FFTComplex a, AE2FFTComplex b)
+static AE2FFT_INLINE AE2FFTComplex AE2FFTComplex_Sub(AE2FFTComplex a, AE2FFTComplex b)
 {
     AE2FFTComplex ret;
     ret.real = a.real - b.real;
@@ -45,7 +54,7 @@ static AE2FFTComplex AE2FFTComplex_Sub(AE2FFTComplex a, AE2FFTComplex b)
 }
 
 /* 複素数乗算 */
-static AE2FFTComplex AE2FFTComplex_Mul(AE2FFTComplex a, AE2FFTComplex b)
+static AE2FFT_INLINE AE2FFTComplex AE2FFTComplex_Mul(AE2FFTComplex a, AE2FFTComplex b)
 {
     AE2FFTComplex ret;
     ret.real = a.real * b.real - a.imag * b.imag;
@@ -70,11 +79,11 @@ static void AE2FFT_ComplexFFT(int n, const int flag, AE2FFTComplex *x, AE2FFTCom
         const int n1 = (n >> 2);
         const int n2 = (n >> 1);
         const int n3 = n1 + n2;
-        const float theta0 = (float)(2.0f * AE2_PI / n);
+        const float theta0 = 2.0 * AE2_PI / n;
         AE2FFTComplex j, wdelta, w1p;
-        j.real = 0.0f; j.imag = flag;
-        wdelta.real = (float)cos(theta0); wdelta.imag = -flag * (float)sin(theta0);
-        w1p.real = 1.0f; w1p.imag = 0.0f;
+        j.real = 0.0; j.imag = -flag;
+        wdelta.real = cos(theta0); wdelta.imag = flag * sin(theta0);
+        w1p.real = 1.0; w1p.imag = 0.0;
         for (p = 0; p < n1; p++) {
             /* より精密 しかしsin,cosの関数呼び出しがある
             * const AE2FFTComplex w1p = { cos(p * theta0), flag * sin(p * theta0) }; */
@@ -138,32 +147,32 @@ void AE2FFT_FloatFFT(int n, const int flag, float *x, float *y)
 void AE2FFT_RealFFT(int n, const int flag, float *x, float *y)
 {
     int i;
-    const float theta = (float)(-flag * 2.0f * AE2_PI / n);
-    const float wpi = (float)sin(theta);
-    const float wpr = (float)cos(theta) - 1.0f;
-    const float c2 = (float)flag * 0.5f;
+    const float theta = flag * 2.0 * AE2_PI / n;
+    const float wpi = sin(theta);
+    const float wpr = cos(theta) - 1.0;
+    const float c2 = flag * 0.5;
     float wr, wi, wtmp;
 
-    /* FFTの場合は先に順変換 */
+    /* FFTの場合は先に変換 */
     if (flag == -1) {
         AE2FFT_FloatFFT(n >> 1, -1, x, y);
     }
 
     /* 回転因子初期化 */
-    wr = 1.0f + wpr;
+    wr = 1.0 + wpr;
     wi = wpi;
 
     /* スペクトルの対称性を使用し */
     /* FFTの場合は最終結果をまとめ、IFFTの場合は元に戻るよう整理 */
-    for (i = 1; i < (n >> 2); i++) {
+    for (i = 1; i <= (n >> 2); i++) {
         const int i1 = (i << 1);
         const int i2 = i1 + 1;
         const int i3 = n - i1;
         const int i4 = i3 + 1;
-        const float h1r = 0.5f * (x[i1] + x[i3]);
-        const float h1i = 0.5f * (x[i2] - x[i4]);
-        const float h2r =  -c2 * (x[i2] + x[i4]);
-        const float h2i =   c2 * (x[i1] - x[i3]);
+        const float h1r = 0.5 * (x[i1] + x[i3]);
+        const float h1i = 0.5 * (x[i2] - x[i4]);
+        const float h2r = -c2 * (x[i2] + x[i4]);
+        const float h2i =  c2 * (x[i1] - x[i3]);
         x[i1] =  h1r + (wr * h2r) - (wi * h2i);
         x[i2] =  h1i + (wr * h2i) + (wi * h2r);
         x[i3] =  h1r - (wr * h2r) + (wi * h2i);
@@ -181,8 +190,8 @@ void AE2FFT_RealFFT(int n, const int flag, float *x, float *y)
             x[0] = h1r + x[1];
             x[1] = h1r - x[1];
         } else {
-            x[0] = 0.5f * (h1r + x[1]);
-            x[1] = 0.5f * (h1r - x[1]);
+            x[0] = 0.5 * (h1r + x[1]);
+            x[1] = 0.5 * (h1r - x[1]);
             AE2FFT_FloatFFT(n >> 1, 1, x, y);
         }
     }
